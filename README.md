@@ -134,7 +134,7 @@ Codex can also invoke the skill implicitly via natural language:
 
 | File | Purpose | Change frequency |
 |------|---------|-----------------|
-| `projectbrief.md` | Core requirements, scope, stakeholders | Rarely |
+| `projectBrief.md` | Core requirements, scope, stakeholders | Rarely |
 | `productContext.md` | Why the project exists, audience, UX goals | Occasionally |
 | `systemPatterns.md` | Architecture, design patterns, conventions | When architecture changes |
 | `techContext.md` | Tech stack, dependencies, build setup | When deps/infra change |
@@ -155,8 +155,8 @@ project, suggest running `/memory init` (or `$memory init` in Codex).
 ## How it works
 
 1. **`init`** scans your project and creates `memory-bank/` with 7 structured files
-2. The init step adds `@import` references to your agent config (e.g., `CLAUDE.md`)
-3. At the start of each session, your agent loads these files automatically
+2. The init step adds essential file imports to your agent config (e.g., `CLAUDE.md`)
+3. At the start of each session, your agent loads the 2 essential files automatically and reads the other 5 on demand as the task requires
 4. **`update`** refreshes the files based on git history and current state
 5. Context persists across sessions — no re-explaining your project
 
@@ -178,7 +178,7 @@ The memory bank files themselves are plain markdown — readable by any tool.
 ├── LICENSE                       # MIT
 ├── README.md
 └── references/
-    ├── claudemd-snippet.md       # Config snippet injected into agent config
+    ├── agent-config-snippet.md    # Config snippet injected into agent config
     ├── commands/
     │   ├── init.md               # Initialize memory bank
     │   ├── update.md             # Update memory bank
@@ -188,7 +188,7 @@ The memory bank files themselves are plain markdown — readable by any tool.
     │   ├── track.md              # Un-gitignore memory bank
     │   └── purge.md              # Delete everything
     └── templates/
-        ├── projectbrief.md
+        ├── projectBrief.md
         ├── productContext.md
         ├── systemPatterns.md
         ├── techContext.md
@@ -197,9 +197,20 @@ The memory bank files themselves are plain markdown — readable by any tool.
         └── decisions.md
 ```
 
+## Best practices
+
+- **Update after each session** — run the update command before ending a session where significant work was done
+- **Review progress.md when resuming** — it's the fastest way to remember where you left off
+- **Keep files concise** — each file should stay under 200 lines; the update command consolidates automatically
+- **Let structure evolve** — start with the 7 core files; add additional context files only when a topic outgrows its section
+- **projectBrief.md is the foundation** — get this right first; other files build on it
+- **decisions.md is append-only** — never remove entries; this prevents the agent from re-suggesting rejected approaches
+
 ## Design
 
-The decision log and session summary features are inspired by [OpenViking](https://github.com/anthropics/openviking)'s memory categories (events, cases, patterns) and structured session commits. Adapted here for zero-dependency markdown files targeting individual developers.
+The structured memory bank concept is inspired by [Cline](https://docs.cline.bot/features/memory-bank)'s Memory Bank — a community-driven approach to persistent AI context using markdown files and custom instructions. This skill adapts that concept into a cross-agent skill that works with Claude Code, Codex, Cursor, Windsurf, GitHub Copilot, and any agent that supports the Agent Skills specification.
+
+The decision log and session summary features draw from [OpenViking](https://github.com/anthropics/openviking)'s memory categories (events, cases, patterns) and structured session commits. Adapted here for zero-dependency markdown files targeting individual developers.
 
 ## License
 

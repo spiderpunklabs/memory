@@ -23,14 +23,14 @@ Full health check of the memory bank. Read-only — does not modify any files.
    - Does `activeContext.md` "Current Focus" align with `progress.md` "In Progress"?
    - Does `techContext.md` match what's actually in package.json / requirements.txt / go.mod? (re-scan and diff)
    - Does `systemPatterns.md` reflect the actual directory structure?
-   - Does `projectbrief.md` align with the current README.md?
+   - Does `projectBrief.md` align with the current README.md?
    - Does `decisions.md` have entries, or is it still empty from init?
 
 6. **Output a health report**:
 
 ```
 Memory Bank Status:
-  projectbrief.md    [status] [sections]    (updated: YYYY-MM-DD)
+  projectBrief.md    [status] [sections]    (updated: YYYY-MM-DD)
   productContext.md  [status] [sections]    (updated: YYYY-MM-DD)
   systemPatterns.md  [status] [sections]    (updated: YYYY-MM-DD)
   techContext.md     [status] [sections]    (updated: YYYY-MM-DD)

@@ -1,12 +1,14 @@
 ---
 name: memory
 description: >-
-  Manage a structured project memory bank. This skill should be used when the
-  user says "memory init", "memory update", "memory status", "memory export",
-  "memory ignore", "memory track", "memory purge", "initialize memory bank",
-  "setup memory bank", "create memory bank", "update memory bank",
-  "check memory status", or "update project context".
-version: 0.1.0
+  Persistent project memory for AI coding agents. Maintains structured markdown
+  files (project brief, system patterns, tech context, progress, decisions) that
+  survive between sessions. Use when the user says "memory init", "memory update",
+  "memory status", "memory export", "memory ignore", "memory track",
+  "memory purge", "initialize memory bank", "setup memory bank",
+  "create memory bank", "update memory bank", "check memory status",
+  or "update project context".
+version: 0.2.0
 ---
 
 # memory — Project Memory Bank

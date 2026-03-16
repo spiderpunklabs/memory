@@ -9,7 +9,7 @@ Delete the memory bank and all related configuration. This is destructive and ir
 2. **Path validation**: Resolve `memory-bank/` relative to the current working directory. Never follow absolute paths or parent-directory references (`../`). If the resolved path escapes the project root, abort with an error.
 
 3. **Confirm with user**: "This will permanently delete:
-   - `memory-bank/` directory and all 7 files (projectbrief.md, productContext.md, systemPatterns.md, techContext.md, activeContext.md, progress.md, decisions.md)
+   - `memory-bank/` directory and all 7 files (projectBrief.md, productContext.md, systemPatterns.md, techContext.md, activeContext.md, progress.md, decisions.md)
    - Memory bank section from agent config (CLAUDE.md / AGENTS.md)
 
    Type `purge` to confirm, or anything else to cancel."

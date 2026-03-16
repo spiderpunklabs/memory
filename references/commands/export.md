@@ -5,7 +5,7 @@ Consolidate all 7 memory bank files into a single markdown document.
 ## Steps
 
 1. **Read all 7 memory bank files** in order:
-   - projectbrief.md, productContext.md, systemPatterns.md
+   - projectBrief.md, productContext.md, systemPatterns.md
    - techContext.md, activeContext.md, progress.md, decisions.md
 
 2. **Build a single document**:
