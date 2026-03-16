@@ -1,4 +1,4 @@
-# /memory export
+# memory export
 
 Consolidate all 7 memory bank files into a single markdown document.
 

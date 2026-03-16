@@ -29,6 +29,14 @@ npx skills add spiderpunklabs/memory -a codex
 npx skills add spiderpunklabs/memory -a claude-code -a codex -a cursor
 ```
 
+### Upgrade
+
+Re-run the install command to pull the latest version:
+
+```bash
+npx skills add spiderpunklabs/memory
+```
+
 ## Subcommands
 
 | Command | Purpose |
@@ -37,8 +45,8 @@ npx skills add spiderpunklabs/memory -a claude-code -a codex -a cursor
 | `update` | Update memory bank files with current project state |
 | `status` | Health check — completeness, consistency, staleness |
 | `export` | Consolidate all files into a single markdown document |
-| `hide` | Add `memory-bank/` to `.gitignore` |
-| `unhide` | Remove `memory-bank/` from `.gitignore` |
+| `ignore` | Add `memory-bank/` to `.gitignore` |
+| `track` | Remove `memory-bank/` from `.gitignore` |
 | `purge` | Delete memory bank and remove agent config imports |
 
 ## Claude Code
@@ -50,8 +58,8 @@ Claude Code invokes skills using slash command syntax — prefix any subcommand 
 /memory update
 /memory status
 /memory export
-/memory hide
-/memory unhide
+/memory ignore
+/memory track
 /memory purge
 ```
 
@@ -102,8 +110,8 @@ $memory init
 $memory update
 $memory status
 $memory export
-$memory hide
-$memory unhide
+$memory ignore
+$memory track
 $memory purge
 ```
 
@@ -176,8 +184,8 @@ The memory bank files themselves are plain markdown — readable by any tool.
     │   ├── update.md             # Update memory bank
     │   ├── status.md             # Health check
     │   ├── export.md             # Export to single doc
-    │   ├── hide.md               # Gitignore memory bank
-    │   ├── unhide.md             # Un-gitignore memory bank
+    │   ├── ignore.md             # Gitignore memory bank
+    │   ├── track.md              # Un-gitignore memory bank
     │   └── purge.md              # Delete everything
     └── templates/
         ├── projectbrief.md

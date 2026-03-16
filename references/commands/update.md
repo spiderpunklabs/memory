@@ -1,4 +1,4 @@
-# /memory update
+# memory update
 
 Update the memory bank files to reflect the current state of work.
 

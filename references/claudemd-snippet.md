@@ -22,9 +22,9 @@ The following files contain project context and should be loaded at the start of
 ## Memory Bank Rules
 
 - **Read all memory bank files** at the start of every conversation or task
-- **Update memory bank** after completing significant work (use `/memory update`)
+- **Update memory bank** after completing significant work (use the update command)
 - `activeContext.md` and `progress.md` change most frequently
 - `projectbrief.md` is the foundational document — other files build on it
 - Never remove information from memory bank files without explicit instruction
-- **Before ending a session** where significant work was done, suggest `/memory update`
+- **Before ending a session** where significant work was done, suggest running the update command
 - **When a decision is made or an approach is rejected**, log it in `decisions.md` (append-only — never remove entries)

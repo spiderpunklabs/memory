@@ -1,10 +1,10 @@
-# /memory init [description]
+# memory init [description]
 
 Initialize a structured memory bank in the current project.
 
 Accepts an optional description string for seeding context (useful for empty/new projects):
-- `/memory init` — auto-scan project for context
-- `/memory init A React Native fitness app with Expo and Supabase` — use description as seed context
+- `memory init` — auto-scan project for context
+- `memory init A React Native fitness app with Expo and Supabase` — use description as seed context
 
 ## Steps
 
@@ -63,5 +63,5 @@ Detect which agent is executing this skill and update the appropriate config fil
 - Print a summary of what was created/modified
 - List all files created in memory-bank/
 - Note which agent config file was created or updated
-- Mention available `/memory` subcommands: update, status, export, hide, unhide, purge
+- Mention available subcommands: update, status, export, ignore, track, purge
 - Remind user that memory bank files are loaded at the start of each session via agent config imports

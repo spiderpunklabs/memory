@@ -1,10 +1,10 @@
-# /memory status
+# memory status
 
 Full health check of the memory bank. Read-only — does not modify any files.
 
 ## Steps
 
-1. **Check memory-bank/ exists** — if not, tell user to run `/memory init`
+1. **Check memory-bank/ exists** — if not, tell user to run the init command
 
 2. **Read all 7 memory bank files** and for each file:
    - Count populated sections (has content beyond headers) vs empty sections (only headers or "Not yet documented")
@@ -17,7 +17,7 @@ Full health check of the memory bank. Read-only — does not modify any files.
 4. **Check for bloat**:
    - Count the number of lines in each memory bank file
    - If any file exceeds 200 lines, flag it with a "consider consolidating" warning
-   - Suggest running `/memory update` which includes a consolidation step
+   - Suggest running the update command which includes a consolidation step
 
 5. **Check cross-file consistency**:
    - Does `activeContext.md` "Current Focus" align with `progress.md` "In Progress"?
@@ -45,5 +45,5 @@ Consistency:
   [any cross-file inconsistencies found]
 
 Overall: X/7 healthy, Y incomplete, Z stale
-Tip: Run /memory update to refresh
+Tip: Run the update command to refresh
 ```

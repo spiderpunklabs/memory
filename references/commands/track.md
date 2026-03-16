@@ -1,4 +1,4 @@
-# /memory unhide
+# memory track
 
 Remove `memory-bank/` from `.gitignore` to resume git-tracking the memory bank.
 

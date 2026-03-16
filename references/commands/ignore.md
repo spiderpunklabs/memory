@@ -1,4 +1,4 @@
-# /memory hide
+# memory ignore
 
 Add `memory-bank/` to `.gitignore` to stop git-tracking the memory bank.
 
