@@ -29,6 +29,18 @@ npx skills add spiderpunklabs/memory -a codex
 npx skills add spiderpunklabs/memory -a claude-code -a codex -a cursor
 ```
 
+### Codex invocation
+
+Codex uses `$memory` syntax instead of `/memory`:
+
+```
+$memory init
+$memory update
+$memory status
+```
+
+Codex can also invoke the skill implicitly via natural language (e.g., "initialize memory bank", "update memory bank").
+
 ## Subcommands
 
 | Command | Purpose |
