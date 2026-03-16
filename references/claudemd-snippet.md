@@ -13,6 +13,7 @@ The following files contain project context and should be loaded at the start of
 - `memory-bank/techContext.md`
 - `memory-bank/activeContext.md`
 - `memory-bank/progress.md`
+- `memory-bank/decisions.md`
 
 > **Agent-specific loading:** Claude Code uses `@memory-bank/filename.md` imports for
 > auto-loading. Other agents (Codex, Cursor, etc.) should read these files directly at
@@ -25,3 +26,5 @@ The following files contain project context and should be loaded at the start of
 - `activeContext.md` and `progress.md` change most frequently
 - `projectbrief.md` is the foundational document — other files build on it
 - Never remove information from memory bank files without explicit instruction
+- **Before ending a session** where significant work was done, suggest `/memory update`
+- **When a decision is made or an approach is rejected**, log it in `decisions.md` (append-only — never remove entries)

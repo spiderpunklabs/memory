@@ -5,7 +5,7 @@ Delete the memory bank and all related configuration. This is destructive and ir
 ## Steps
 
 1. **Confirm with user**: "This will permanently delete:
-   - `memory-bank/` directory and all 6 files
+   - `memory-bank/` directory and all 7 files (projectbrief.md, productContext.md, systemPatterns.md, techContext.md, activeContext.md, progress.md, decisions.md)
    - Memory bank section from agent config (CLAUDE.md / AGENTS.md)
    Are you sure? (yes/no)"
 

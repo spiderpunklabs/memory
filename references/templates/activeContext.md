@@ -6,7 +6,13 @@
 <!-- What is actively being worked on right now? -->
 
 ## Recent Changes
-<!-- What changed recently that affects current work? -->
+<!-- Dated session summaries — newest first, keep last 3 detailed, summarize older -->
+<!-- Format:
+### Session: YYYY-MM-DD
+- **Done**: what was accomplished
+- **Decisions**: key decisions made (also logged in decisions.md)
+- **Next**: immediate next steps
+-->
 
 ## Active Decisions
 <!-- Decisions currently being considered or recently made -->

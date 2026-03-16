@@ -1,12 +1,12 @@
 # /memory
 
-A structured project memory bank for AI coding agents. Persists project context across sessions using 6 markdown files loaded via agent config imports.
+A structured project memory bank for AI coding agents. Persists project context across sessions using 7 markdown files loaded via agent config imports.
 
 Works with **Claude Code**, **Codex**, **Cursor**, and any agent that reads SKILL.md.
 
 ## Why
 
-AI coding agents lose context between sessions. `/memory` solves this by maintaining 6 structured markdown files that capture your project's brief, product context, system patterns, tech stack, active focus, and progress. These files are loaded automatically at the start of each session via your agent's config file.
+AI coding agents lose context between sessions. `/memory` solves this by maintaining 7 structured markdown files that capture your project's brief, product context, system patterns, tech stack, active focus, progress, and decisions. These files are loaded automatically at the start of each session via your agent's config file.
 
 **No databases. No vector stores. No MCP servers.** Just markdown files and `@imports`.
 
@@ -49,7 +49,7 @@ npx skills add spiderpunklabs/memory -a claude-code -a codex -a cursor
 /memory init
 ```
 
-Scans your project for README, package.json, directory structure, etc. and creates 6 populated files in `memory-bank/`. Also updates your agent config (`CLAUDE.md`, `AGENTS.md`, etc.) with import references.
+Scans your project for README, package.json, directory structure, etc. and creates 7 populated files in `memory-bank/`. Also updates your agent config (`CLAUDE.md`, `AGENTS.md`, etc.) with import references.
 
 For empty projects, provide a description:
 
@@ -79,7 +79,7 @@ Read-only report showing completeness, staleness, and cross-file consistency.
 /memory export
 ```
 
-Consolidates all 6 files into a single markdown document for sharing or backup.
+Consolidates all 7 files into a single markdown document for sharing or backup.
 
 ## Memory Bank Files
 
@@ -91,6 +91,7 @@ Consolidates all 6 files into a single markdown document for sharing or backup.
 | `techContext.md` | Tech stack, dependencies, build setup | When deps/infra change |
 | `activeContext.md` | Current focus, open questions, next steps | Every session |
 | `progress.md` | What's done, in progress, remaining, issues | Every session |
+| `decisions.md` | Decisions made, alternatives rejected, project-specific learnings | When decisions are made |
 
 ## Recommended: Auto-init prompt
 
@@ -104,7 +105,7 @@ project, suggest running `/memory init`.
 
 ## How it works
 
-1. **`/memory init`** scans your project and creates `memory-bank/` with 6 structured files
+1. **`/memory init`** scans your project and creates `memory-bank/` with 7 structured files
 2. The init step adds `@import` references to your agent config (e.g., `CLAUDE.md`)
 3. At the start of each session, your agent loads these files automatically
 4. **`/memory update`** refreshes the files based on git history and current state
@@ -143,8 +144,13 @@ The memory bank files themselves are plain markdown — readable by any tool.
         ├── systemPatterns.md
         ├── techContext.md
         ├── activeContext.md
-        └── progress.md
+        ├── progress.md
+        └── decisions.md
 ```
+
+## Design
+
+The decision log and session summary features are inspired by [OpenViking](https://github.com/anthropics/openviking)'s memory categories (events, cases, patterns) and structured session commits. Adapted here for zero-dependency markdown files targeting individual developers.
 
 ## License
 

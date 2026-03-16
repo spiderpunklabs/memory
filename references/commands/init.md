@@ -36,7 +36,8 @@ Accepts an optional description string for seeding context (useful for empty/new
 
 ### 4. Create memory-bank/
 - Create the `memory-bank/` directory
-- For each of the 6 template files: read the template from the skill's `references/templates/` directory, fill in real project context discovered in Step 1 (replacing HTML comment hints with actual content), and write to `memory-bank/`
+- For each of the 7 template files (`projectbrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`, `decisions.md`): read the template from the skill's `references/templates/` directory, fill in real project context discovered in Step 1 (replacing HTML comment hints with actual content), and write to `memory-bank/`
+- `decisions.md` starts mostly empty — its sections are populated over time as decisions are made
 - Templates provide structure; fill in substance from what was discovered
 - If a section has no discoverable info, leave it with a brief "Not yet documented" note rather than the HTML comment
 
