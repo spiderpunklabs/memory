@@ -1,4 +1,4 @@
-# /memory
+# memory
 
 A structured project memory bank for AI coding agents. Persists project context across sessions using 7 markdown files loaded via agent config imports.
 
@@ -6,7 +6,7 @@ Works with **Claude Code**, **Codex**, **Cursor**, and any agent that reads SKIL
 
 ## Why
 
-AI coding agents lose context between sessions. `/memory` solves this by maintaining 7 structured markdown files that capture your project's brief, product context, system patterns, tech stack, active focus, progress, and decisions. These files are loaded automatically at the start of each session via your agent's config file.
+AI coding agents lose context between sessions. This skill solves that by maintaining 7 structured markdown files that capture your project's brief, product context, system patterns, tech stack, active focus, progress, and decisions. These files are loaded automatically at the start of each session via your agent's config file.
 
 **No databases. No vector stores. No MCP servers.** Just markdown files and `@imports`.
 
@@ -29,31 +29,31 @@ npx skills add spiderpunklabs/memory -a codex
 npx skills add spiderpunklabs/memory -a claude-code -a codex -a cursor
 ```
 
-### Codex invocation
-
-Codex uses `$memory` syntax instead of `/memory`:
-
-```
-$memory init
-$memory update
-$memory status
-```
-
-Codex can also invoke the skill implicitly via natural language (e.g., "initialize memory bank", "update memory bank").
-
 ## Subcommands
 
 | Command | Purpose |
 |---------|---------|
-| `/memory init [description]` | Initialize a new memory bank in the current project |
-| `/memory update` | Update memory bank files with current project state |
-| `/memory status` | Health check — completeness, consistency, staleness |
-| `/memory export` | Consolidate all files into a single markdown document |
-| `/memory hide` | Add `memory-bank/` to `.gitignore` |
-| `/memory unhide` | Remove `memory-bank/` from `.gitignore` |
-| `/memory purge` | Delete memory bank and remove agent config imports |
+| `init [description]` | Initialize a new memory bank in the current project |
+| `update` | Update memory bank files with current project state |
+| `status` | Health check — completeness, consistency, staleness |
+| `export` | Consolidate all files into a single markdown document |
+| `hide` | Add `memory-bank/` to `.gitignore` |
+| `unhide` | Remove `memory-bank/` from `.gitignore` |
+| `purge` | Delete memory bank and remove agent config imports |
 
-## Usage
+## Claude Code
+
+Claude Code invokes skills using slash command syntax — prefix any subcommand with `/memory`:
+
+```
+/memory init
+/memory update
+/memory status
+/memory export
+/memory hide
+/memory unhide
+/memory purge
+```
 
 ### Initialize a memory bank
 
@@ -93,6 +93,35 @@ Read-only report showing completeness, staleness, and cross-file consistency.
 
 Consolidates all 7 files into a single markdown document for sharing or backup.
 
+## Codex
+
+Codex uses `$` prefix syntax for custom skill invocation — prefix any subcommand with `$memory`:
+
+```
+$memory init
+$memory update
+$memory status
+$memory export
+$memory hide
+$memory unhide
+$memory purge
+```
+
+Examples:
+
+```
+$memory init A Go microservice with gRPC and PostgreSQL
+$memory update
+$memory status
+```
+
+Codex can also invoke the skill implicitly via natural language:
+
+- "initialize memory bank"
+- "update memory bank"
+- "check memory status"
+- "export memory bank"
+
 ## Memory Bank Files
 
 | File | Purpose | Change frequency |
@@ -112,15 +141,15 @@ Add this to your agent config file (`~/.claude/CLAUDE.md` for Claude Code, `AGEN
 ```markdown
 ## Memory Bank
 At the start of any session, if no `memory-bank/` directory exists in the current
-project, suggest running `/memory init`.
+project, suggest running `/memory init` (or `$memory init` in Codex).
 ```
 
 ## How it works
 
-1. **`/memory init`** scans your project and creates `memory-bank/` with 7 structured files
+1. **`init`** scans your project and creates `memory-bank/` with 7 structured files
 2. The init step adds `@import` references to your agent config (e.g., `CLAUDE.md`)
 3. At the start of each session, your agent loads these files automatically
-4. **`/memory update`** refreshes the files based on git history and current state
+4. **`update`** refreshes the files based on git history and current state
 5. Context persists across sessions — no re-explaining your project
 
 ## Agent compatibility
