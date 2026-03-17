@@ -199,12 +199,15 @@ The memory bank files themselves are plain markdown — readable by any tool.
 
 ## Best practices
 
+- **Store intent, not implementation** — memory captures decisions, constraints, handoff state, and hard-won conclusions. Code supplies implementation truth. If `rg` can answer it in 10 seconds, don't store it.
 - **Update after each session** — run the update command before ending a session where significant work was done
-- **Review progress.md when resuming** — it's the fastest way to remember where you left off
-- **Keep files concise** — each file should stay under 200 lines; the update command consolidates automatically
+- **activeContext.md is a handoff, not a diary** — rewrite it each update as a briefing for the next session. If it reads like a timeline, compress it.
+- **Essential files have a budget** — `projectBrief.md` + `activeContext.md` should stay under ~150 lines combined (~2,000 tokens). The status command checks this.
+- **Keep all files concise** — each file should stay under 200 lines; the update command consolidates automatically
 - **Let structure evolve** — start with the 7 core files; add additional context files only when a topic outgrows its section
 - **projectBrief.md is the foundation** — get this right first; other files build on it
-- **decisions.md is append-only** — never remove entries; this prevents the agent from re-suggesting rejected approaches
+- **decisions.md is append-only** — never remove entries; include scope and status to help future agents know when a decision applies
+- **Review progress.md when resuming** — it's the fastest way to remember where you left off
 
 ## Design
 

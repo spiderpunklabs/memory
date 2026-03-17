@@ -12,6 +12,8 @@ These files are loaded automatically at the start of every conversation:
 - `memory-bank/projectBrief.md` — foundation: what this project is
 - `memory-bank/activeContext.md` — current focus, recent changes, next steps
 
+> **Budget**: Essential files should stay under ~150 lines combined. If they grow beyond this, compress during the next update.
+
 > **Agent-specific loading:** Claude Code uses `@memory-bank/filename.md` imports for
 > auto-loading. Other agents (Codex, Cursor, etc.) should read these files directly at
 > the start of each session.

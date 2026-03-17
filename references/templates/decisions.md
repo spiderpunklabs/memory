@@ -1,15 +1,19 @@
 # Decisions
 
-<!-- Claude: This is an append-only log. Never remove entries. Add new decisions at the top. -->
+<!-- Append-only log. Never remove entries. Add new decisions at the top of each section. -->
 
 ## Key Decisions
-<!-- Format: YYYY-MM-DD: **Decision** — rationale -->
-<!-- Record significant architectural, design, or tooling decisions and why they were made -->
+<!-- Format:
+YYYY-MM-DD: **Decision** — rationale
+Scope: where this applies (e.g., "all API routes", "auth module", "project-wide")
+Status: active | superseded by [X] | revisit when [Y]
+-->
 
 ## Rejected Alternatives
-<!-- Format: YYYY-MM-DD: **Rejected** — reason -->
-<!-- What was considered and explicitly rejected? Prevents re-suggesting dead-end approaches -->
+<!-- Format:
+YYYY-MM-DD: **Rejected: approach** — reason it was rejected
+Scope: what area this applies to
+-->
 
 ## Project-Specific Patterns
 <!-- Learned behaviors specific to this project that aren't obvious from code -->
-<!-- Example: "Always run migrations before seeding", "The /api/v2 routes require auth header even in dev" -->

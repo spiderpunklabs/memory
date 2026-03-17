@@ -72,6 +72,42 @@ Before proceeding to template filling, organize what was learned:
 - **Project maturity**: early-stage, actively developed, stable/maintenance, or stale (from git history)
 - **Gaps**: what couldn't be determined from code alone (these become "Not yet documented" or open questions)
 
+### 1d. What belongs in memory
+
+Before filling templates, apply this filter to everything discovered above. This determines what goes into memory bank files vs. what agents should read from code each time.
+
+**Store in memory** (expensive to reconstruct, not encoded in code):
+- Current thread state: what's active, what's next, what's blocked
+- Durable decisions: rejected approaches, accepted tradeoffs, product constraints
+- Task routing hints: "if working on X, read these files/classes first"
+- Non-obvious repo patterns: intentional quirks, swallowed exceptions, naming traps
+- Product context: scope boundaries, PM constraints, user-experience goals
+- Research conclusions: synthesized findings, not raw notes
+- Known traps: stale docs, misleading naming, generated artifacts
+
+**Read from code every time** (cheap to reconstruct, must be current):
+- Exact implementation details: method behavior, class wiring, enum values
+- Current API shape: routes, payloads, response semantics
+- Module structure: file locations, package names, build dependencies
+- Test coverage and behavior
+- Current repo state: staged files, branches, merge conflicts
+- Build commands when uncertainty exists
+
+**Never store or store only briefly**:
+- Raw session transcripts or command logs
+- Long file inventories or directory listings
+- Re-derivable architecture prose (the kind `rg` can answer in 10 seconds)
+- Local machine repair notes or environment config
+- Large copied docs/spec summaries
+- Worktree noise unless it blocks current work
+
+**Anti-patterns** (avoid these during init and all future updates):
+- "Summarize the whole repo" memory — memory captures intent and decisions, not a directory listing
+- "Every session gets appended forever" memory — prune aggressively
+- "Memory as substitute for code reading" — if `rg` can answer it, don't store it
+- "Speculative notes written as facts" — only store what's confirmed
+- "Current git status" memory — unless it's blocking current work
+
 ### 2. Handle edge cases
 - If `memory-bank/` already exists → ask user: **reinitialize** (overwrite and re-populate from fresh scan), **merge** (update existing files with fresh scan), or **cancel**
 - If agent config already contains memory bank references → skip config update, inform user
@@ -97,14 +133,39 @@ Before proceeding to template filling, organize what was learned:
 - Templates provide structure; fill in substance from what was discovered
 - Prefer writing 2-3 concrete sentences over vague placeholders — if you read the code, say what you learned
 
-**Filling guidance by file**:
+**Filling guidance by file** (what to include vs. exclude):
+
 - **projectBrief.md** — project name from manifest/repo. Overview from README + entry point analysis. Core requirements from README or docs.
+  - *Include*: what the repo is, core scope, major modules, stable stakeholders
+  - *Exclude*: session state, recent work, tactical priorities
+  - Rewrite rarely
+
 - **productContext.md** — purpose and audience from README/docs. Key user flows from route definitions, page structure, or CLI commands.
+  - *Include*: who this serves, what outcomes matter, stable product constraints, UX goals
+  - *Exclude*: open brainstorming, temporary prioritization churn
+
 - **systemPatterns.md** — benefits most from deep analysis. Architecture from directory structure + entry points. Design patterns from code inspection. Component relationships from imports/directory organization. Data flow from tracing entry point to core modules. Naming conventions and error handling from observed code.
+  - *Include*: how components fit together, recurring patterns, lifecycle norms, naming/error-handling conventions
+  - *Exclude*: one-off features, current sprint specifics, every module detail
+  - Update only when patterns change
+
 - **techContext.md** — stack from manifests. Build & dev setup from scripts/Makefile. Development commands verbatim from package.json scripts or equivalent. Key dependencies with brief inferred rationale. Infrastructure from Docker/CI configs.
+  - *Include*: stack, build commands, major dependencies, configuration model, hard constraints
+  - *Exclude*: transient dependency upgrades, session-local setup, machine-specific quirks
+
 - **activeContext.md** — current focus from recent git history. Recent changes from git log. Next steps inferred from recent commit trajectory.
+  - *Include*: primary thread, current focus, blockers, next concrete move, working set, last 2-3 meaningful updates
+  - *Exclude*: long chronology, deep background, stale repo-state snapshots, finished work older than a few sessions
+  - Rewrite aggressively every update
+
 - **progress.md** — completed work from git history and project maturity. In progress from recent commits and uncommitted changes. Known issues from TODO/FIXME/HACK comments if spotted.
+  - *Include*: what's done, what's in progress, what remains, known issues
+  - *Exclude*: fine-grained session diary, repeated summaries already in activeContext
+
 - **decisions.md** — mostly empty. If obvious architectural decisions are visible (choice of ORM, state management, monorepo structure), log as retroactive entries with today's date.
+  - *Include*: decision, rationale, scope, status, rejected alternatives
+  - *Exclude*: vague observations, temporary chatter, implementation details easy to rediscover
+  - Append-only, compress formatting if it grows
 
 - If a section has no discoverable info, leave it with a brief "Not yet documented" note rather than the HTML comment
 - **Additional context files**: If the project is complex enough that a topic doesn't fit cleanly into the 7 core files (e.g., detailed API specs, multi-service integration docs, complex deployment procedures), create additional `.md` files in `memory-bank/`. Mention these in the summary output. Most projects won't need this.
