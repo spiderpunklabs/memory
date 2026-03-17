@@ -1,6 +1,7 @@
 # memory
 
 [![GitHub tag](https://img.shields.io/github/v/tag/spiderpunklabs/memory?label=version)](https://github.com/spiderpunklabs/memory/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/spiderpunklabs/memory/blob/main/LICENSE)
 
 A structured project memory bank for AI coding agents. Persists project context across sessions using 7 markdown files loaded via agent config imports.
 
