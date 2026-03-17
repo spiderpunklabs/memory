@@ -17,7 +17,7 @@ Delete the memory bank and all related configuration. This is destructive and ir
 4. **If confirmed** (user typed exactly `purge`):
    - Delete the `memory-bank/` directory and all contents
    - Remove the memory bank section from the appropriate agent config file:
-     - **Claude Code** → edit `CLAUDE.md` to remove the block from `# Memory Bank` through `## Memory Bank Rules` and its content
+     - **Claude Code** → edit `CLAUDE.md` to remove the entire block from `# Memory Bank` through the end of the `## Additional Context` section
      - **Codex / other agents** → edit `AGENTS.md` (or whichever config file contains the memory bank section) to remove the same block
    - If the agent config file is now empty after removal, delete it too
    - If `memory-bank/` is in `.gitignore`, remove that line too

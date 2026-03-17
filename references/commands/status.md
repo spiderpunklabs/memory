@@ -8,11 +8,12 @@ Full health check of the memory bank. Read-only — does not modify any files.
 
 2. **Read all 7 memory bank files** and for each file:
    - Count populated sections (has content beyond headers) vs empty sections (only headers or "Not yet documented")
-   - Check last modification date via `git log -1 --format="%ai" -- memory-bank/<file>`
+   - Check last modification date via `git log -1 --format="%ai" -- memory-bank/<file>`. If the file has no git history (untracked or uncommitted), report the date as "uncommitted"
 
 3. **Score staleness** for each file:
-   - Count commits since each memory bank file was last modified (`git rev-list --count <last-commit>..HEAD`)
+   - Count commits since each memory bank file was last modified (`git rev-list --count <last-commit>..HEAD`). If a file has no git history, assign staleness as "Unknown — not yet committed"
    - Assign a staleness level:
+     - **Unknown**: file has no git history (not yet committed)
      - **Fresh**: updated within last 3 commits or last session
      - **Warm**: 4-10 commits since last update
      - **Stale**: 11-20 commits since last update

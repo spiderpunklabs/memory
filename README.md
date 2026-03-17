@@ -19,8 +19,11 @@ AI coding agents lose context between sessions. This skill solves that by mainta
 # Using npx skills (recommended)
 npx skills add spiderpunklabs/memory
 
-# Or manually
+# Or manually (use your agent's skills directory)
+# Claude Code
 git clone https://github.com/spiderpunklabs/memory.git ~/.claude/skills/memory
+# Codex
+git clone https://github.com/spiderpunklabs/memory.git ~/.codex/skills/memory
 ```
 
 ### Multi-agent install
@@ -176,7 +179,7 @@ The memory bank files themselves are plain markdown — readable by any tool.
 ## File structure
 
 ```
-~/.claude/skills/memory/          (or wherever your agent loads skills from)
+~/<agent>/skills/memory/          (e.g., ~/.claude for Claude Code, ~/.codex for Codex)
 ├── SKILL.md                      # Skill definition and subcommand router
 ├── LICENSE                       # MIT
 ├── README.md
