@@ -26,6 +26,8 @@ Update the memory bank files to reflect the current state of work.
 
    > Before writing, apply this test: **Store it only if it's hard to reconstruct quickly, valuable across sessions, not obvious from code, and likely to affect future decisions.** If a fact is easy to verify from code, shorten it or delete it from memory. Memory stores intent, constraints, handoff state, and hard-won conclusions. Code supplies implementation truth.
 
+   **Evidence anchors**: When adding or updating claims in warm files, optionally include a `Source:` line (file path, commit, or PR) for non-obvious claims. This is especially valuable for decisions and architectural patterns. Keep evidence to one line — a pointer, not a quote. Use bare references only — file paths, commit hashes, or PR numbers. No inline descriptions or parenthetical clarifiers.
+
    Per-file guidance (what to include vs. exclude):
 
    - `activeContext.md` — almost always needs rewriting (see step 5)
@@ -73,6 +75,7 @@ Update the memory bank files to reflect the current state of work.
      - **Date and decision**: what was decided and why
      - **Scope**: where this applies (helps future agents know when the decision is relevant)
      - **Status**: `active` by default. Update to `superseded by [X]` if a later decision replaces it, or `revisit when [Y]` if it's time-bound.
+     - **Source** (optional): file path, commit hash, or PR that supports this decision
    - When updating existing decisions:
      - Never remove entries
      - You may update the Status field of an existing entry (e.g., marking it superseded)
@@ -108,6 +111,7 @@ Update the memory bank files to reflect the current state of work.
    - Ensure techContext.md reflects any new dependencies or tools
    - Ensure systemPatterns.md reflects any new architectural decisions
    - Ensure decisions.md captures any significant choices from this session
+   - Check evidence anchors in warm files: if any `Source:` line references a file that no longer exists or a path that has moved, update or remove the anchor
 
 10. **Report**:
    - List which files were updated and summarize key changes

@@ -26,18 +26,27 @@ Full health check of the memory bank. Read-only — does not modify any files.
    - Count the number of lines in each memory bank file
    - If any file exceeds 200 lines, flag it with a "consider consolidating" warning
 
-6. **Check cross-file consistency**:
+6. **Verify evidence anchors**:
+   - Scan warm files (systemPatterns.md, techContext.md, decisions.md, productContext.md, progress.md) for `Source:` lines outside of HTML comments (`<!-- -->` blocks)
+   - For each file path referenced, check if the file still exists
+   - For each commit hash referenced, check if it exists in git history (`git cat-file -t <hash>`)
+   - Report broken evidence:
+     - Count total evidence anchors found
+     - List any with broken references (file deleted, commit not found)
+   - This is informational — broken evidence doesn't block anything, but signals claims that may need re-verification
+
+7. **Check cross-file consistency**:
    - Does `activeContext.md` "Primary Thread" align with `progress.md` "In Progress"?
    - Does `techContext.md` match what's actually in package.json / requirements.txt / go.mod? (re-scan and diff)
    - Does `systemPatterns.md` reflect the actual directory structure?
    - Does `projectBrief.md` align with the current README.md?
    - Does `decisions.md` have entries, or is it still empty from init?
 
-7. **Priority-ranked update recommendations**:
+8. **Priority-ranked update recommendations**:
    - Sort files by: essential + stale first, then on-demand + stale, then warm
    - Recommend update order based on priority
 
-8. **Output a health report**:
+9. **Output a health report**:
 
 ```
 Memory Bank Status:
@@ -55,6 +64,10 @@ Memory Bank Status:
     progress.md        [Stale]  67 lines    (updated: 2026-03-09)
 
   Bloat: [any files over 200 lines]
+
+  Evidence:
+    12 anchors across 4 files
+    1 broken: decisions.md:15 → src/old-auth.ts (file not found)
 
   Consistency:
     [any cross-file inconsistencies found]

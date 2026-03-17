@@ -8,7 +8,7 @@ description: >-
   "memory purge", "initialize memory bank", "setup memory bank",
   "create memory bank", "update memory bank", "check memory status",
   or "update project context".
-version: 0.2.5
+version: 0.2.6
 ---
 
 # memory — Project Memory Bank

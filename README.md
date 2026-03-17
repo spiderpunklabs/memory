@@ -209,6 +209,7 @@ The memory bank files themselves are plain markdown — readable by any tool.
 - **Keep all files concise** — each file should stay under 200 lines; the update command consolidates automatically
 - **Let structure evolve** — start with the 7 core files; add additional context files only when a topic outgrows its section
 - **projectBrief.md is the foundation** — get this right first; other files build on it
+- **Add evidence to non-obvious claims** — in warm files (decisions, systemPatterns, techContext, productContext, progress), optionally include a `Source:` line pointing to the file, commit, or PR that supports the claim. The status command verifies these.
 - **decisions.md is append-only** — never remove entries; include scope and status to help future agents know when a decision applies
 - **Review progress.md when resuming** — it's the fastest way to remember where you left off
 

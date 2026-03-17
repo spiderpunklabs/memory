@@ -108,6 +108,8 @@ Before filling templates, apply this filter to everything discovered above. This
 - "Speculative notes written as facts" — only store what's confirmed
 - "Current git status" memory — unless it's blocking current work
 
+**Evidence anchors**: When writing claims in warm files (systemPatterns, techContext, decisions, productContext, progress), optionally add a `Source:` line pointing to where the claim can be verified — a file path, commit hash, or PR number. Keep it to one line. Use bare file paths, commit hashes, or PR references only — no inline descriptions or parenthetical clarifiers (e.g., `Source: adapter/adapter.go`, not `Source: adapter/adapter.go (writeOutput function)`). This helps future agents verify claims without re-deriving context. Never add evidence anchors to essential files (projectBrief, activeContext).
+
 ### 2. Handle edge cases
 - If `memory-bank/` already exists → ask user: **reinitialize** (overwrite and re-populate from fresh scan), **merge** (update existing files with fresh scan), or **cancel**
 - If agent config already contains memory bank references → skip config update, inform user
@@ -144,12 +146,12 @@ Before filling templates, apply this filter to everything discovered above. This
   - *Include*: who this serves, what outcomes matter, stable product constraints, UX goals
   - *Exclude*: open brainstorming, temporary prioritization churn
 
-- **systemPatterns.md** — benefits most from deep analysis. Architecture from directory structure + entry points. Design patterns from code inspection. Component relationships from imports/directory organization. Data flow from tracing entry point to core modules. Naming conventions and error handling from observed code.
+- **systemPatterns.md** — benefits most from deep analysis. Architecture from directory structure + entry points. Design patterns from code inspection. Component relationships from imports/directory organization. Data flow from tracing entry point to core modules. Naming conventions and error handling from observed code. Optionally add `Source:` lines for non-obvious architectural claims.
   - *Include*: how components fit together, recurring patterns, lifecycle norms, naming/error-handling conventions
   - *Exclude*: one-off features, current sprint specifics, every module detail
   - Update only when patterns change
 
-- **techContext.md** — stack from manifests. Build & dev setup from scripts/Makefile. Development commands verbatim from package.json scripts or equivalent. Key dependencies with brief inferred rationale. Infrastructure from Docker/CI configs.
+- **techContext.md** — stack from manifests. Build & dev setup from scripts/Makefile. Development commands verbatim from package.json scripts or equivalent. Key dependencies with brief inferred rationale. Infrastructure from Docker/CI configs. Optionally add `Source:` lines for non-obvious technical claims.
   - *Include*: stack, build commands, major dependencies, configuration model, hard constraints
   - *Exclude*: transient dependency upgrades, session-local setup, machine-specific quirks
 
@@ -162,8 +164,8 @@ Before filling templates, apply this filter to everything discovered above. This
   - *Include*: what's done, what's in progress, what remains, known issues
   - *Exclude*: fine-grained session diary, repeated summaries already in activeContext
 
-- **decisions.md** — mostly empty. If obvious architectural decisions are visible (choice of ORM, state management, monorepo structure), log as retroactive entries with today's date.
-  - *Include*: decision, rationale, scope, status, rejected alternatives
+- **decisions.md** — mostly empty. If obvious architectural decisions are visible (choice of ORM, state management, monorepo structure), log as retroactive entries with today's date. Include an optional `Source:` line pointing to the file path, commit hash, or PR number that supports the decision. Each reference must be something the status command can verify — avoid non-checkable references like "git log" or "code review".
+  - *Include*: decision, rationale, scope, status, rejected alternatives, optional Source line
   - *Exclude*: vague observations, temporary chatter, implementation details easy to rediscover
   - Append-only, compress formatting if it grows
 
