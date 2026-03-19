@@ -26,7 +26,29 @@ Update the memory bank files to reflect the current state of work.
 
    > Before writing, apply this test: **Store it only if it's hard to reconstruct quickly, valuable across sessions, not obvious from code, and likely to affect future decisions.** If a fact is easy to verify from code, shorten it or delete it from memory. Memory stores intent, constraints, handoff state, and hard-won conclusions. Code supplies implementation truth.
 
-   **Evidence anchors**: When adding or updating claims in warm files, optionally include a `Source:` line (file path, commit, or PR) for non-obvious claims. This is especially valuable for decisions and architectural patterns. Keep evidence to one line — a pointer, not a quote. Use bare references only — file paths, commit hashes, or PR numbers. No inline descriptions or parenthetical clarifiers.
+   **Drift check** — before rewriting any section:
+   - If the new text is vaguer than the old (fewer proper nouns, more hedges) → keep the old text
+   - If the new text contradicts the old → verify the change before overwriting, and add a `Source:` line
+   - If the new text is >80% similar to the old → skip the rewrite, don't churn files
+
+   **Format migration (MANDATORY)**: If existing content uses prose, bullets, or free-form text where the template expects structured format, you MUST migrate during this update. Read each template from `references/templates/` — the templates contain explicit `[fill:]` placeholders showing the required format. Specific migrations:
+   - Prose tech stack → `Languages:`, `Framework:`, `Test runner:`, `Bundler:`, `Package manager:` key-value fields
+   - Prose infrastructure → `Hosting:`, `CI/CD:`, `Database:`, `External services:` key-value fields
+   - Prose dev commands → `| Command | What it does |` markdown table
+   - Prose architecture → `Type:`, `Entry point(s):`, `Layer structure:` key-value fields
+   - Prose component relationships → `A -> B : description` arrow notation
+   - Prose naming conventions → `| Scope | Convention | Example |` markdown table
+   - Sequential numbered user flows → `Trigger → Action → Outcome` one-line arrow flows
+   - Missing `Scope:` / `Status:` on decision entries → add them
+   - Wrong section names in activeContext (e.g., "Current Focus" instead of "Primary Thread") → rename to match template exactly
+
+   **Evidence anchors**: When adding or updating claims in warm files, include a `Source:` line (file path, commit, or PR) for non-obvious claims. This is the default, not optional. Keep evidence to one line — a pointer, not a quote. Use bare references only — file paths, commit hashes, or PR numbers. No inline descriptions or parenthetical clarifiers.
+
+   **Confidence markers**: When updating warm files, mark claims by certainty:
+   - `[observed]` — seen directly in code or config
+   - `[inferred]` — deduced from structure, naming, or context
+   - `[assumed]` — not verified, best guess
+   Status checks flag `[assumed]` claims as pending verification.
 
    Per-file guidance (what to include vs. exclude):
 
@@ -85,10 +107,24 @@ Update the memory bank files to reflect the current state of work.
    - In `progress.md`: roll completed items older than ~2 weeks into a single summary line (e.g., "Pre-2025-03-01: Initial setup, auth module, CI pipeline")
    - Remove "Not yet documented" placeholders if a section now has real content
 
-   **Check essential file budget**: Count combined lines of `projectBrief.md` and `activeContext.md`. If over 150 lines combined (~2,000 tokens):
+   **Check per-file budgets** (target / hard ceiling of 200):
+
+   | File | Budget |
+   |------|--------|
+   | `projectBrief.md` | 80 |
+   | `activeContext.md` | 70 |
+   | `productContext.md` | 80 |
+   | `systemPatterns.md` | 120 |
+   | `techContext.md` | 100 |
+   | `progress.md` | 80 |
+   | `decisions.md` | 150 |
+
+   **Essential files** (`projectBrief.md` + `activeContext.md`) must stay under 150 lines combined (~2,000 tokens). If over budget:
    - Compress `projectBrief.md` to core identity only (what the repo is, core scope, major modules — no elaboration)
    - Prune `activeContext.md`: keep only Primary Thread, Resume Here, Working Set, Blockers, and last 2 Recent Changes entries
-   - Move any detailed content that was in these files to the appropriate warm file (systemPatterns, techContext, etc.)
+   - Move any detailed content to the appropriate warm file (systemPatterns, techContext, etc.)
+
+   **Warm files** over their budget: compress, split into additional context files, or prune re-derivable content.
 
    **Compression heuristics** (apply ruthlessly):
    - If `activeContext.md` reads like a timeline → rewrite it as a handoff (see step 5)
@@ -113,7 +149,34 @@ Update the memory bank files to reflect the current state of work.
    - Ensure decisions.md captures any significant choices from this session
    - Check evidence anchors in warm files: if any `Source:` line references a file that no longer exists or a path that has moved, update or remove the anchor
 
-10. **Report**:
+10. **Format verification** (same checklist as init — apply after every update):
+
+    **techContext.md**:
+    - `## Tech Stack` has `Languages:`, `Framework:`, `Test runner:`, `Bundler:`, `Package manager:` as key-value fields
+    - `## Infrastructure` has `Hosting:`, `CI/CD:`, `Database:`, `External services:` as key-value fields
+    - `## Development Commands` uses a markdown table or explains why none exist
+
+    **systemPatterns.md**:
+    - `## Architecture Overview` has `Type:`, `Entry point(s):`, `Layer structure:` key-value fields
+    - `## Component Relationships` uses `A -> B : description` arrow notation
+    - `## Naming Conventions` uses a `| Scope | Convention | Example |` table
+
+    **activeContext.md**:
+    - Uses exact section names: `## Primary Thread`, `## Resume Here`, `## Working Set`
+    - `## Resume Here` names a specific file, function, or task
+
+    **decisions.md**:
+    - Each Key Decisions entry has `Scope:` and `Status:` lines
+
+    **productContext.md**:
+    - `## Key User Flows` uses `→` or `->` arrow notation, one flow per line
+
+    **Warm files**: each has ≥1 `Source:` line and ≥1 confidence marker (`[observed]`/`[inferred]`/`[assumed]`)
+    **Essential files**: no `Source:` lines, no confidence markers
+
+    Fix any failures before reporting.
+
+11. **Report**:
    - List which files were updated and summarize key changes
    - Flag any inconsistencies or gaps discovered
    - Note any decisions captured in decisions.md

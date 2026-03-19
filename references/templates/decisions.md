@@ -1,20 +1,20 @@
 # Decisions
 
-<!-- Append-only log. Never remove entries. Add new decisions at the top of each section. -->
+<!-- Append-only log. Never remove entries. Budget: 150 lines max. -->
 
 ## Key Decisions
-<!-- Format:
-YYYY-MM-DD: **Decision** — rationale
-Scope: where this applies (e.g., "all API routes", "auth module", "project-wide")
-Status: active | superseded by [X] | revisit when [Y]
-Source: (optional) file path, commit, or PR that supports this decision
+<!-- Each entry MUST include Scope and Status lines. Delete this comment block when filling.
+Format:
+YYYY-MM-DD: **Decision title** — rationale
+Scope: what area this applies to
+Status: active
+Source: file path or commit (optional)
 -->
 
 ## Rejected Alternatives
 <!-- Format:
 YYYY-MM-DD: **Rejected: approach** — reason it was rejected
 Scope: what area this applies to
-Source: (optional) where the rejection was discussed or the evidence that led to it
 -->
 
 ## Project-Specific Patterns

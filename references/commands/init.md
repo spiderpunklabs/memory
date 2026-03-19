@@ -6,6 +6,17 @@ Accepts an optional description string for seeding context (useful for empty/new
 - `memory init` — auto-scan project for context
 - `memory init A React Native fitness app with Expo and Supabase` — use description as seed context
 
+## What memory is
+
+Memory is a **handoff document**, not a specification. It answers: "What does the next session need to know to be productive immediately?"
+
+- **NOT** a comprehensive system specification (that's the code)
+- **NOT** a project wiki (too much detail kills context budgets)
+- **NOT** a session log or a substitute for reading code
+- **IS** a briefing, routing table, decision record, pattern catalog, scope boundary
+
+**The test**: If an agent reads the memory bank and still needs to ask "what are you working on?" — memory failed. If an agent never needs to read source code — memory is doing too much.
+
 ## Steps
 
 ### 1. Discover
@@ -72,43 +83,54 @@ Before proceeding to template filling, organize what was learned:
 - **Project maturity**: early-stage, actively developed, stable/maintenance, or stale (from git history)
 - **Gaps**: what couldn't be determined from code alone (these become "Not yet documented" or open questions)
 
-### 1d. What belongs in memory
+### 1d. What belongs in memory — memory vs. specification
 
-Before filling templates, apply this filter to everything discovered above. This determines what goes into memory bank files vs. what agents should read from code each time.
+Before filling templates, apply this filter. Memory captures the 5% that is expensive to reconstruct, not the 95% code already encodes.
 
-**Store in memory** (expensive to reconstruct, not encoded in code):
-- Current thread state: what's active, what's next, what's blocked
-- Durable decisions: rejected approaches, accepted tradeoffs, product constraints
-- Task routing hints: "if working on X, read these files/classes first"
-- Non-obvious repo patterns: intentional quirks, swallowed exceptions, naming traps
-- Product context: scope boundaries, PM constraints, user-experience goals
-- Research conclusions: synthesized findings, not raw notes
-- Known traps: stale docs, misleading naming, generated artifacts
+**The Borges map**: A map that reproduces the territory at 1:1 scale is useless. Memory that restates what code says is equally useless. Store intent, constraints, decisions, and routing hints — not implementation details.
 
-**Read from code every time** (cheap to reconstruct, must be current):
-- Exact implementation details: method behavior, class wiring, enum values
-- Current API shape: routes, payloads, response semantics
-- Module structure: file locations, package names, build dependencies
-- Test coverage and behavior
-- Current repo state: staged files, branches, merge conflicts
-- Build commands when uncertainty exists
+**Store in memory**: thread state, durable decisions, routing hints ("if working on X, read Y first"), non-obvious repo patterns, product constraints, research conclusions.
 
-**Never store or store only briefly**:
-- Raw session transcripts or command logs
-- Long file inventories or directory listings
-- Re-derivable architecture prose (the kind `rg` can answer in 10 seconds)
-- Local machine repair notes or environment config
-- Large copied docs/spec summaries
-- Worktree noise unless it blocks current work
+**Read from code every time**: implementation details, API shape, module structure, test coverage, repo state, build commands.
 
-**Anti-patterns** (avoid these during init and all future updates):
-- "Summarize the whole repo" memory — memory captures intent and decisions, not a directory listing
-- "Every session gets appended forever" memory — prune aggressively
-- "Memory as substitute for code reading" — if `rg` can answer it, don't store it
-- "Speculative notes written as facts" — only store what's confirmed
-- "Current git status" memory — unless it's blocking current work
+**Never store**: raw transcripts, directory listings, re-derivable prose, machine-specific config, large spec summaries.
 
-**Evidence anchors**: When writing claims in warm files (systemPatterns, techContext, decisions, productContext, progress), optionally add a `Source:` line pointing to where the claim can be verified — a file path, commit hash, or PR number. Keep it to one line. Use bare file paths, commit hashes, or PR references only — no inline descriptions or parenthetical clarifiers (e.g., `Source: adapter/adapter.go`, not `Source: adapter/adapter.go (writeOutput function)`). This helps future agents verify claims without re-deriving context. Never add evidence anchors to essential files (projectBrief, activeContext).
+**Anti-patterns**:
+- **Specification filler**: every sentence must name something concrete — a file, tool, pattern, decision. Prose that "sounds informative but communicates nothing specific" is worse than an empty section.
+- **The Borges map**: memory captures the 5% expensive to reconstruct, not the 95% code already encodes. If `rg` can answer it in 10 seconds, don't store it.
+- **The ever-growing diary**: memory is a snapshot, not a timeline. Prune aggressively.
+- **A substitute for code reading**: memory tells agents *which* files to read and *why*, not *what* those files contain.
+- **Speculative notes as facts**: only store what's confirmed. Move uncertainty to Open Questions.
+
+### 1e. Specificity gate
+
+Before writing any memory bank file, apply these self-checks to every sentence:
+
+- **Substitution test**: Could this sentence describe a different project? If yes, it's filler — make it specific or delete it.
+- **Quantification test**: Does it use "several", "various", "many" without specifics? Replace with an actual list or count, or delete.
+- **Hedge test**: "seems to", "appears to", "might" — verify and state as fact, or move to Open Questions.
+- **Tautology test**: Does it restate the section header? (e.g., "Architecture Overview: This section describes the architecture.") Delete.
+
+**Density test**: Each section must contain at least one proper noun (tool name, file path, pattern name, dependency). A section with zero proper nouns is filler.
+
+### 1f. No-filler rule
+
+Every sentence in a memory bank file must satisfy at least one of:
+1. Names something specific (a file, tool, pattern, endpoint, config key)
+2. States a relationship between two specific things
+3. Captures a decision and its rationale
+4. Identifies a gap or open question
+
+If none apply, delete the sentence. An empty section with "Not yet documented" beats vague prose.
+
+**Evidence anchors**: When writing claims in warm files (systemPatterns, techContext, decisions, productContext, progress), add a `Source:` line pointing to where the claim can be verified — a file path, commit hash, or PR number. This is the default for non-obvious claims, not optional. Keep it to one line. Use bare references only (e.g., `Source: adapter/adapter.go`, not `Source: adapter/adapter.go (writeOutput function)`). Never add evidence anchors to essential files (projectBrief, activeContext).
+
+**Confidence markers**: When the source of a claim varies in certainty, mark it:
+- `[observed]` — seen directly in code or config
+- `[inferred]` — deduced from structure, naming, or context
+- `[assumed]` — not verified, best guess
+
+Status checks flag `[assumed]` claims as pending verification.
 
 ### 2. Handle edge cases
 - If `memory-bank/` already exists → ask user: **reinitialize** (overwrite and re-populate from fresh scan), **merge** (update existing files with fresh scan), or **cancel**
@@ -130,10 +152,35 @@ Before filling templates, apply this filter to everything discovered above. This
 
 ### 4. Create memory-bank/
 - Create the `memory-bank/` directory
-- For each of the 7 template files (`projectBrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`, `decisions.md`): read the template from the skill's `references/templates/` directory, fill in real project context discovered in Steps 1a-1c, and write to `memory-bank/`
-- `decisions.md` starts mostly empty — its sections are populated over time as decisions are made
-- Templates provide structure; fill in substance from what was discovered
-- Prefer writing 2-3 concrete sentences over vague placeholders — if you read the code, say what you learned
+- For each of the 7 template files, follow this two-step process:
+  1. **Copy**: Read the template from `references/templates/<file>` and write it verbatim to `memory-bank/<file>`
+  2. **Fill**: Use the Edit tool to replace each `[fill: ...]` placeholder and HTML comment with real content discovered in Steps 1a-1c
+
+This copy-then-edit workflow ensures the template structure is preserved. The templates contain key-value fields (like `Languages:`), markdown tables, arrow notation, and fixed section headings that MUST appear in the final output.
+
+**Rules when editing:**
+- **Key-value fields** (e.g., `Languages: [fill: ...]`): replace the `[fill: ...]` placeholder with the real value. Use `none` if not applicable. Do NOT delete the line or convert to bullets.
+- **Tables** (e.g., `| Command | What it does |`): replace `[fill]` cells with real values, or replace the entire table with a one-line explanation if no data exists (e.g., "None — zero external dependencies").
+- **Section headings**: keep exactly as named. Do NOT rename `## Primary Thread` to `## Current Focus` or similar.
+- **Arrow notation** in Component Relationships: replace the comment with real `A -> B : description` lines.
+- **HTML comments**: replace with real content. Delete the comment tags but keep the surrounding structure.
+
+Template files: `projectBrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`, `decisions.md`
+
+`decisions.md` starts mostly empty — its sections are populated over time. Prefer 2-3 concrete sentences over vague placeholders.
+
+**Per-file line budgets** (target, not hard cap — 200 is the hard ceiling):
+
+| File | Budget | Notes |
+|------|--------|-------|
+| `projectBrief.md` | 80 | Essential. Elaboration → productContext or systemPatterns |
+| `activeContext.md` | 70 | Essential. Combined with projectBrief ≤ 150 |
+| `productContext.md` | 80 | Warm. Stable context, keep tight |
+| `systemPatterns.md` | 120 | Warm. Most structured — tables/arrows need room |
+| `techContext.md` | 100 | Warm. Commands/deps tables take space |
+| `progress.md` | 80 | Warm. Roll up old items aggressively |
+| `decisions.md` | 150 | Warm. Append-only — compress formatting, not content |
+| **Total** | **680** | ~9,000 tokens across all 7 files |
 
 **Filling guidance by file** (what to include vs. exclude):
 
@@ -171,6 +218,42 @@ Before filling templates, apply this filter to everything discovered above. This
 
 - If a section has no discoverable info, leave it with a brief "Not yet documented" note rather than the HTML comment
 - **Additional context files**: If the project is complex enough that a topic doesn't fit cleanly into the 7 core files (e.g., detailed API specs, multi-service integration docs, complex deployment procedures), create additional `.md` files in `memory-bank/`. Mention these in the summary output. Most projects won't need this.
+
+### 4b. Format verification (MANDATORY)
+
+After writing all 7 files, re-read each one and verify the following. If any check fails, edit the file to fix it before proceeding to step 5. Do not skip this step.
+
+**techContext.md**:
+- `## Tech Stack` contains `Languages:`, `Framework:`, `Test runner:`, `Bundler:`, `Package manager:` as key-value fields (not bullets or prose)
+- `## Infrastructure` contains `Hosting:`, `CI/CD:`, `Database:`, `External services:` as key-value fields
+- `## Development Commands` uses a `| Command | What it does |` markdown table (or a one-liner explaining why no commands exist, e.g., "No build commands — open index.html directly")
+- `## Dependencies` uses a table or explicitly states "None" / "Zero external dependencies"
+
+**systemPatterns.md**:
+- `## Architecture Overview` contains `Type:`, `Entry point(s):`, `Layer structure:` as key-value fields (not a prose paragraph)
+- `## Component Relationships` uses `A -> B : description` arrow notation (not prose descriptions)
+- `## Naming Conventions` uses a `| Scope | Convention | Example |` markdown table
+- At least one `Source:` line exists somewhere in the file
+
+**activeContext.md**:
+- Uses these exact section names: `## Primary Thread`, `## Resume Here`, `## Working Set`, `## Blockers`, `## Recent Changes`
+- `## Resume Here` names a specific file, function, or task
+- `## Working Set` lists 3-5 specific files
+
+**decisions.md**:
+- Each entry in Key Decisions has `Scope:` and `Status:` lines immediately after the decision line
+- No template example text remains (e.g., "Use SQLite over PostgreSQL")
+
+**productContext.md**:
+- `## Key User Flows` uses `→` or `->` arrow notation, one flow per line (not numbered sequential steps)
+
+**Warm files** (systemPatterns, techContext, decisions, productContext, progress):
+- Each file has at least one `Source:` line with a bare reference (file path, commit hash, or PR)
+- Each file has at least one confidence marker (`[observed]`, `[inferred]`, or `[assumed]`)
+
+**Essential files** (projectBrief, activeContext):
+- No `Source:` lines
+- No confidence markers
 
 ### 5. Create/update agent config
 

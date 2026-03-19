@@ -1,5 +1,6 @@
 # Progress
 
+<!-- Budget: 80 lines max. -->
 <!-- Claude: Track what's done, what's left, and what's broken. Update after each significant change. -->
 
 ## Completed

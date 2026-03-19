@@ -1,5 +1,6 @@
 # Project Brief
 
+<!-- Budget: 80 lines max. -->
 <!-- Claude: Replace comment hints with actual project context discovered during init. Leave sections empty if unknown. -->
 
 ## Project Name

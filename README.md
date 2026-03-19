@@ -160,11 +160,12 @@ project, suggest running `/memory init` (or `$memory init` in Codex).
 
 ## How it works
 
-1. **`init`** scans your project and creates `memory-bank/` with 7 structured files
+1. **`init`** scans your project and creates `memory-bank/` with 7 structured files using copy-then-edit templates with `[fill:]` placeholders for structural compliance
 2. The init step adds essential file imports to your agent config (e.g., `CLAUDE.md`)
 3. At the start of each session, your agent loads the 2 essential files automatically and reads the other 5 on demand as the task requires
-4. **`update`** refreshes the files based on git history and current state
-5. Context persists across sessions — no re-explaining your project
+4. **`update`** refreshes the files based on git history and current state, with format migration, drift checking, and evidence validation
+5. **`status`** reports per-file line budgets, evidence anchor health, confidence audit, and cross-file consistency
+6. Context persists across sessions — no re-explaining your project
 
 ## Agent compatibility
 
@@ -212,8 +213,8 @@ The memory bank files themselves are plain markdown — readable by any tool.
 - **Keep all files concise** — each file should stay under 200 lines; the update command consolidates automatically
 - **Let structure evolve** — start with the 7 core files; add additional context files only when a topic outgrows its section
 - **projectBrief.md is the foundation** — get this right first; other files build on it
-- **Add evidence to non-obvious claims** — in warm files (decisions, systemPatterns, techContext, productContext, progress), optionally include a `Source:` line pointing to the file, commit, or PR that supports the claim. The status command verifies these.
-- **decisions.md is append-only** — never remove entries; include scope and status to help future agents know when a decision applies
+- **Add evidence to non-obvious claims** — in warm files (decisions, systemPatterns, techContext, productContext, progress), include a `Source:` line pointing to the file, commit, or PR that supports the claim. Add confidence markers (`[observed]`, `[inferred]`, `[assumed]`) to indicate certainty level. The status command verifies these.
+- **decisions.md is append-only** — never remove entries; include `Scope:` and `Status:` fields to help future agents know when a decision applies
 - **Review progress.md when resuming** — it's the fastest way to remember where you left off
 
 ## Design
