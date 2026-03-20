@@ -1,12 +1,11 @@
 # memory export
 
-Consolidate all 7 memory bank files into a single markdown document.
+Consolidate all 5 memory bank files into a single markdown document.
 
 ## Steps
 
-1. **Read all 7 memory bank files** in order:
-   - projectBrief.md, productContext.md, systemPatterns.md
-   - techContext.md, activeContext.md, progress.md, decisions.md
+1. **Read all 5 memory bank files** in order:
+   - projectContext.md, activeState.md, systemPatterns.md, techContext.md, decisions.md
 
 2. **Build a single document**:
    - Add a header: `# Memory Bank Export — <project name>`

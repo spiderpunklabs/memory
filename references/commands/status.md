@@ -1,115 +1,157 @@
 # memory status
 
-Full health check of the memory bank. Read-only — does not modify any files.
+Strict validation of the memory bank. Read-only — does not modify any files.
+
+Every check produces PASS or FAIL. The final line is either `STATUS: ALL CHECKS PASSED` or `STATUS: N FAILURES DETECTED`.
 
 ## Steps
 
-1. **Check memory-bank/ exists** — if not, tell user to run the init command
+### 1. Check memory-bank/ exists
+If not, tell user to run the init command and stop.
 
-2. **Read all 7 memory bank files** and for each file:
-   - Count populated sections (has content beyond headers) vs empty sections (only headers or "Not yet documented")
-   - Check last modification date via `git log -1 --format="%ai" -- memory-bank/<file>`. If the file has no git history (untracked or uncommitted), report the date as "uncommitted"
+### 2. Read all 5 memory bank files
+Read: projectContext.md, activeState.md, systemPatterns.md, techContext.md, decisions.md
 
-3. **Score staleness** for each file:
-   - Count commits since each memory bank file was last modified (`git rev-list --count <last-commit>..HEAD`). If a file has no git history, assign staleness as "Unknown — not yet committed"
-   - Assign a staleness level:
-     - **Unknown**: file has no git history (not yet committed)
-     - **Fresh**: updated within last 3 commits or last session
-     - **Warm**: 4-10 commits since last update
-     - **Stale**: 11-20 commits since last update
-     - **Critical**: >20 commits since last update, or file contains "Not yet documented" in most sections
+For each file:
+- Count lines
+- Check last modification date via `git log -1 --format="%ai" -- memory-bank/<file>` (report "uncommitted" if no git history)
 
-4. **Check per-file budgets**:
-   - Count lines in each memory bank file and compare against budgets:
+### 3. Score staleness
+Count commits since each file was last modified (`git rev-list --count <last-commit>..HEAD`):
+- **Unknown**: file has no git history (not yet committed)
+- **Fresh**: updated within last 3 commits
+- **Warm**: 4-10 commits since last update
+- **Stale**: 11-20 commits since last update
+- **Critical**: >20 commits since last update
 
-     | File | Budget |
-     |------|--------|
-     | `projectBrief.md` | 80 |
-     | `activeContext.md` | 70 |
-     | `productContext.md` | 80 |
-     | `systemPatterns.md` | 120 |
-     | `techContext.md` | 100 |
-     | `progress.md` | 80 |
-     | `decisions.md` | 150 |
+### 4. Run all 44 validation checks
 
-   - Flag files over budget with "over budget — compress on next update"
-   - Check combined lines of `projectBrief.md` + `activeContext.md`. If over 150: flag "Essential files over budget"
-   - If any file exceeds 200 lines (hard ceiling), flag with "consider consolidating" warning
+Each check produces `PASS` or `FAIL` with the specific violation.
 
-5. **Verify evidence anchors**:
-   - Scan warm files (systemPatterns.md, techContext.md, decisions.md, productContext.md, progress.md) for `Source:` lines outside of HTML comments (`<!-- -->` blocks)
-   - For each file path referenced, check if the file still exists
-   - For each commit hash referenced, check if it exists in git history (`git cat-file -t <hash>`)
-   - Report broken evidence:
-     - Count total evidence anchors found
-     - List any with broken references (file deleted, commit not found)
-   - This is informational — broken evidence doesn't block anything, but signals claims that may need re-verification
+#### File-Level Checks (6 checks)
+1. File count = exactly 5 `.md` files in `memory-bank/`
+2. No non-core files in `memory-bank/` (exception: `.gitkeep`, `.gitignore`)
+3. Per-file line budgets: projectContext ≤80, activeState ≤70, systemPatterns ≤100, techContext ≤60, decisions ≤150
+4. Essential combined (projectContext + activeState) ≤ 150 lines
+5. Total all files ≤ 460 lines
+6. No subdirectories in `memory-bank/`
 
-6. **Coverage and confidence check**:
-   - **Coverage**: For each warm file, count the percentage of non-empty sections that contain at least one `Source:` line. Flag files below 30% coverage as "mostly ungrounded."
-   - **Confidence audit**: Scan warm files for `[assumed]` markers. List all `[assumed]` claims as "pending verification." Count `[observed]`, `[inferred]`, and `[assumed]` markers per file.
+#### Derivability Gate Checks (11 checks)
+7. No build/dev command tables in any file
+8. No dependency lists or tables in any file
+9. No infrastructure inventory fields (Hosting:, CI/CD:, Database:, External services:)
+10. No naming convention tables in any file
+11. No data flow sections (`## Data Flow` or equivalent) in any file
+12. No error handling sections (`## Error Handling` or equivalent) in any file
+13. No evolution/changelog entries in any file
+14. No completed work items in activeState.md
+15. No recent changes list in activeState.md
+16. No framework/runner/bundler/linter/package-manager fields in techContext.md (only Language: and Runtime: permitted in ## Stack)
+17. No code summaries (what a function does, what a module contains)
 
-7. **Check cross-file consistency**:
-   - Does `activeContext.md` "Primary Thread" align with `progress.md` "In Progress"?
-   - Does `techContext.md` match what's actually in package.json / requirements.txt / go.mod? (re-scan and diff)
-   - Does `systemPatterns.md` reflect the actual directory structure?
-   - Does `projectBrief.md` align with the current README.md?
-   - Does `decisions.md` have entries, or is it still empty from init?
+#### Structural Checks (17 checks)
+18. projectContext.md has all 7 required sections: `## Identity`, `## Purpose`, `## Target Audience`, `## Core Requirements`, `## Success Criteria`, `## Key User Flows`, `## Scope` (with `### In Scope`, `### Out of Scope`)
+19. activeState.md has all 8 required sections: `## Resume Here`, `## Primary Thread`, `## Working Set`, `## In Progress`, `## Remaining`, `## Blockers`, `## Known Issues`, `## Open Questions`
+20. systemPatterns.md has all 5 required sections: `## Architecture Overview`, `## Key Design Decisions`, `## Design Patterns`, `## Component Relationships`, `## Gotchas & Traps`
+21. techContext.md has all 4 required sections: `## Stack`, `## Non-Obvious Constraints`, `## Setup Gotchas`, `## Environment Quirks`
+22. decisions.md has all 3 required sections: `## Key Decisions`, `## Rejected Alternatives`, `## Intent & Patterns`
+23. No additional section headings (## level) beyond those specified above
+24. All key-value fields use `Key: value` format (Identity: Project/Overview, Architecture Overview: Type/Entry point(s)/Layer structure, Stack: Language/Runtime)
+25. Component Relationships uses `->` arrow notation
+26. Key User Flows uses `→` arrow notation
+27. Resume Here names a specific file, function, or task (not generic statements like "review the codebase")
+28. Working Set contains 3-5 file paths
+29. Every Key Decision entry has all 4 required lines: date+decision, Scope:, Status:, Source:
+30. Decision dates are commit dates, not analysis dates
+31. ≥1 Rejected Alternative entry with all 3 required lines: `**What was considered**`, `**Why rejected**`, `**Reconsider if**`
+32. No section heading has empty content below it
+33. No `[fill:]` placeholders remain
+34. No `Not yet documented` appears anywhere
 
-8. **Priority-ranked update recommendations**:
-   - Sort files by: essential + stale first, then on-demand + stale, then warm
-   - Recommend update order based on priority
+#### Evidence Checks (5 checks)
+35. systemPatterns.md, techContext.md, decisions.md each have ≥1 `Source:` line
+36. Every `Source:` reference points to a file that exists in the project
+37. Warm files use confidence markers (`[observed]`, `[inferred]`, or `[assumed]`) on claims
+38. Essential files (projectContext, activeState) contain zero `Source:` lines
+39. Essential files contain zero confidence markers (`[observed]`, `[inferred]`, `[assumed]`)
 
-9. **Output a health report**:
+#### Specificity Checks (5 checks)
+40. No sentence could describe a different project (substitution test)
+41. No unquantified vague terms ("several", "various", "many", "some")
+42. No hedging language ("seems to", "appears to", "might") outside Open Questions
+43. No tautologies (sentence restates its section heading)
+44. Every section contains ≥1 proper noun (file path, tool name, pattern name, dependency, config key)
 
-    The output MUST include ALL of the following sections. Do not skip any section, even if there are zero items to report (state "None" or "0" instead). Use the `NN/BB lines` format (actual/budget) for every file.
+### 5. Cross-file consistency checks
+Report as informational alongside the pass/fail checks:
+- Does `activeState.md` align with `decisions.md`? (active decisions referenced)
+- Does `techContext.md` constraints match actual manifests?
+- Does `systemPatterns.md` architecture match actual directory structure?
+- Does `projectContext.md` scope align with README.md?
+
+### 6. Evidence and confidence summary
+- Count total `Source:` anchors across warm files
+- List any broken references (file deleted, commit not found)
+- Count confidence markers: `[observed]`, `[inferred]`, `[assumed]`
+- List all `[assumed]` claims as "pending verification"
+
+### 7. Output the validation report
 
 ```
 Memory Bank Status:
 
-  Essential (hot):
-    projectBrief.md    [Fresh]  62/80 lines   (updated: 2026-03-17)
-    activeContext.md   [Stale]  94/70 lines ⚠️ over budget  (updated: 2026-03-10)
-    Combined: 156/150 lines ⚠️ over budget — compress on next update
+  File Inventory:
+    projectContext.md  [Fresh]  NN/80 lines   (updated: YYYY-MM-DD)
+    activeState.md     [Warm]   NN/70 lines   (updated: YYYY-MM-DD)
+    systemPatterns.md  [Fresh]  NN/100 lines  (updated: YYYY-MM-DD)
+    techContext.md     [Fresh]  NN/60 lines   (updated: YYYY-MM-DD)
+    decisions.md       [Fresh]  NN/150 lines  (updated: YYYY-MM-DD)
 
-  On-demand (warm):
-    decisions.md       [Fresh]  38/150 lines  (updated: 2026-03-17)
-    systemPatterns.md  [Warm]   120/120 lines (updated: 2026-03-14)
-    techContext.md     [Fresh]  85/100 lines  (updated: 2026-03-16)
-    productContext.md  [Stale]  45/80 lines   (updated: 2026-03-08)
-    progress.md        [Stale]  67/80 lines   (updated: 2026-03-09)
+    Essential combined: NN/150 lines
+    Total: NN/460 lines
 
-  Total: 511/680 lines
+  Validation (44 checks):
+    File-Level:       N/6  passed
+    Derivability:     N/11 passed
+    Structural:       N/17 passed
+    Evidence:         N/5  passed
+    Specificity:      N/5  passed
 
-  Bloat: [any files over 200 hard ceiling, or "None"]
+    Failures:
+      FAIL #NN: <description of violation>
+      FAIL #NN: <description of violation>
 
   Evidence:
-    12 anchors across 4 files, 30% avg coverage
-    1 broken: decisions.md:15 → src/old-auth.ts (file not found)
-    2 files below 30% coverage: productContext.md, progress.md
+    NN anchors across 3 warm files
+    Broken: [list or "None"]
 
   Confidence:
-    [observed]: 8  [inferred]: 3  [assumed]: 2
+    [observed]: NN  [inferred]: NN  [assumed]: NN
     Pending verification:
-      techContext.md:14 — [assumed] Redis used for session caching
-      systemPatterns.md:22 — [assumed] Event-driven between services
+      <file>:<line> — [assumed] <claim>
 
   Consistency:
-    [any cross-file inconsistencies found]
+    [any cross-file inconsistencies, or "All consistent"]
 
-  Recommended update order:
-    1. activeContext.md — stale, essential file, over budget
-    2. productContext.md — stale, low evidence coverage
-    3. progress.md — stale
+  Staleness: N/5 fresh, N warm, N stale
 
-  Overall: X/7 fresh, Y warm, Z stale
+STATUS: ALL CHECKS PASSED
 ```
 
-    **Required sections checklist** — verify all are present before outputting:
-    - [ ] Per-file lines in `NN/BB` format (actual/budget) for all 7 files
-    - [ ] Combined essential line count (`projectBrief + activeContext: NN/150`)
-    - [ ] Total line count (`Total: NN/680`)
-    - [ ] Evidence section with: total anchor count, broken references (if any), files below 30% coverage
-    - [ ] Confidence section with: counts per marker type, `[assumed]` claims listed individually
-    - [ ] Consistency section
-    - [ ] Recommended update order (priority-ranked file list)
+or:
+
+```
+STATUS: N FAILURES DETECTED
+```
+
+**Required sections checklist** — verify all are present before outputting:
+- [ ] Per-file lines in `NN/ceiling` format for all 5 files
+- [ ] Essential combined line count
+- [ ] Total line count with /460 budget
+- [ ] All 44 checks reported with pass/fail counts per category
+- [ ] Any failures listed individually with check number and description
+- [ ] Evidence section with anchor count and broken references
+- [ ] Confidence section with marker counts and assumed claims listed
+- [ ] Consistency section
+- [ ] Staleness summary
+- [ ] Final STATUS line (ALL CHECKS PASSED or N FAILURES DETECTED)

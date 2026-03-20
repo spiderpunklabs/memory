@@ -26,7 +26,6 @@ Memory is a **handoff document**, not a specification. It answers: "What does th
 - Scan the current working directory for: `memory-bank/`, `.gitignore`, `.git/`
 - Detect agent config files: `CLAUDE.md` (Claude Code), `AGENTS.md` (Codex, Cursor, etc.)
 - Detect tech stack by checking for: `package.json`, `requirements.txt`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle`, `Gemfile`, `composer.json`, `*.csproj`
-- Detect beads: check if `bd` CLI is available on PATH
 - Read `README.md` or `README` if present
 - Note the directory structure (top-level only)
 
@@ -35,72 +34,77 @@ Memory is a **handoff document**, not a specification. It answers: "What does th
 If the project has source code, perform targeted analysis to gather substantive context for the memory bank files. Focus on understanding the project's shape, not reading every file.
 
 **Read dependency manifests** (not just detect them):
-- `package.json` → parse `scripts`, `dependencies`, `devDependencies`; note the framework, test runner, bundler, linter
-- `requirements.txt` / `pyproject.toml` → note frameworks (Django, Flask, FastAPI), key libraries
+- `package.json` → parse `scripts`, `dependencies`, `devDependencies`
+- `requirements.txt` / `pyproject.toml` → note frameworks, key libraries
 - `go.mod` → note module path and major dependencies
 - `Cargo.toml` → note crate name, edition, key dependencies
 - Other manifests → extract equivalent information
-- Goal: understand **what tools are used and why**, not just that a manifest exists
+- Goal: understand **what tools are used and why** — but do NOT store dependency lists in memory (derivable)
 
 **Explore directory structure recursively**:
 - List directories 2-3 levels deep (exclude node_modules, vendor, .git, __pycache__, build/dist output)
-- Identify architectural patterns from folder organization: `src/`, `lib/`, `components/`, `routes/`, `api/`, `services/`, `models/`, `utils/`, `hooks/`, `middleware/`, `tests/`, `scripts/`
+- Identify architectural patterns from folder organization
 - For monorepos: identify packages/workspaces and their roles
-- Goal: understand **how the codebase is organized**
+- Goal: understand **how the codebase is organized** — but do NOT store directory listings in memory (derivable)
 
 **Read key source files** (up to 5-8 files, proportional to project size):
 - Entry points: `src/index.*`, `src/main.*`, `app.*`, `main.*`, `server.*`, `cmd/*/main.go`
-- Config files: `tsconfig.json`, `webpack.config.*`, `vite.config.*`, `.eslintrc*`, `tailwind.config.*`, `docker-compose.yml`, `Dockerfile`
-- Route/API definitions: `routes/`, `api/`, `pages/` (top-level files, not every route)
+- Config files: `tsconfig.json`, `webpack.config.*`, `vite.config.*`, `.eslintrc*`, `docker-compose.yml`, `Dockerfile`
+- Route/API definitions: top-level files in `routes/`, `api/`, `pages/`
 - Core modules: the 1-2 files that appear central based on directory structure
-- Goal: understand **design patterns, error handling, naming conventions, data flow**
+- Goal: understand **design patterns, non-obvious constraints, gotchas** — but do NOT summarize what the code does (derivable)
 
 **Check project history** (if `.git/` exists):
 - `git log --oneline -20` — project evolution and activity level
 - `git log --oneline --since="2 weeks ago"` — current momentum and recent focus
-- Goal: inform **progress.md** and **activeContext.md** with real history
+- Goal: inform **activeState.md** with real history — but do NOT store changelog entries (derivable via `git log`)
 
 **Look for additional documentation**:
 - `docs/` directory, `CONTRIBUTING.md`, `CHANGELOG.md`, `ARCHITECTURE.md`
 - API specs: `openapi.yaml`, `swagger.json`, `*.proto`
-- CI/CD configs: `.github/workflows/`, `.gitlab-ci.yml`, `Jenkinsfile`, `.circleci/`
+- CI/CD configs: `.github/workflows/`, `.gitlab-ci.yml`
 - Build files: `Makefile`, `justfile`, `Taskfile.yml`
-- Goal: find documented intent, build/deploy processes, and contribution patterns
-
-**Understand build and dev workflow**:
-- Read the `scripts` section of `package.json` or equivalent (Makefile targets, task runner commands)
-- Check for dev containers (`.devcontainer/`), Docker setup
-- Identify test setup: test runner, test directory structure, test config
-- Goal: populate **techContext.md** with real commands
+- Goal: find documented intent and constraints — but do NOT store build commands or infrastructure inventory (derivable)
 
 #### 1c. Synthesize findings
 
 Before proceeding to template filling, organize what was learned:
-- **Architecture**: high-level shape (monolith, API+client, microservices, CLI tool, library, static site)
-- **Patterns**: design patterns evident (component-based, MVC, event-driven, repository pattern, middleware chain)
-- **Data flow**: how data moves (HTTP request lifecycle, state management, pub/sub, CLI argument parsing)
+- **Architecture**: high-level shape (monolith, API+client, microservices, CLI tool, library, kernel module)
+- **Patterns**: design patterns evident (component-based, MVC, event-driven, repository pattern)
 - **Stack rationale**: not just what tools, but why those tools (infer from context)
+- **Non-obvious constraints**: things that will break code if an agent doesn't know them
+- **Gotchas**: things that look wrong but are intentional, non-obvious side effects
+- **Decisions**: architectural choices and their implied rejected alternatives
 - **Project maturity**: early-stage, actively developed, stable/maintenance, or stale (from git history)
-- **Gaps**: what couldn't be determined from code alone (these become "Not yet documented" or open questions)
+- **Gaps**: what couldn't be determined from code alone (these become open questions)
 
-### 1d. What belongs in memory — memory vs. specification
+### 1d. Derivability gate — PROHIBITED content
 
-Before filling templates, apply this filter. Memory captures the 5% that is expensive to reconstruct, not the 95% code already encodes.
+**Before writing any memory bank file**, apply this gate. Memory captures the 5% that is expensive to reconstruct, not the 95% code already encodes.
 
-**The Borges map**: A map that reproduces the territory at 1:1 scale is useless. Memory that restates what code says is equally useless. Store intent, constraints, decisions, and routing hints — not implementation details.
+The following content is **PROHIBITED** in all memory files. If present, format verification FAILS.
 
-**Store in memory**: thread state, durable decisions, routing hints ("if working on X, read Y first"), non-obvious repo patterns, product constraints, research conclusions.
+| Prohibited Content | Where It Lives Instead |
+|-------------------|----------------------|
+| Build/dev command tables | `cat Makefile`, `cat package.json` `scripts` field, `cat Cargo.toml` |
+| Dependency lists or tables | `cat package.json`, `cat go.mod`, `cat Cargo.toml`, `cat requirements.txt` |
+| Infrastructure inventory (Hosting, CI/CD, Database, External services as fields) | Presence/absence of `.github/workflows/`, `Dockerfile`, `docker-compose.yml`, `*.tf` |
+| Naming convention tables | Read any 2-3 source files |
+| Data flow descriptions | Trace call chains in source files |
+| Error handling descriptions | Read source files |
+| Evolution/changelog entries | `git log --oneline` |
+| Completed work items | Code exists + `git log` |
+| Recent changes list | `git log --oneline -5` |
+| Framework/test runner/bundler/linter/package manager fields | Config files (`tsconfig.json`, `.eslintrc`, `jest.config`, etc.) |
+| Code summaries (what a function does, what a module contains) | Read the code |
 
-**Read from code every time**: implementation details, API shape, module structure, test coverage, repo state, build commands.
+**Derivability test** (applied per-claim during filling): If a claim can be verified by reading a single project file or running a single command (`git log`, `ls`, `cat <file>`), it MUST NOT appear in memory.
 
-**Never store**: raw transcripts, directory listings, re-derivable prose, machine-specific config, large spec summaries.
+**Exception**: The `Stack` fields in techContext.md (Language, Runtime) are permitted as 1-line routing hints despite being derivable, because they prevent agents from needing to scan the entire project to identify the language.
 
-**Anti-patterns**:
-- **Specification filler**: every sentence must name something concrete — a file, tool, pattern, decision. Prose that "sounds informative but communicates nothing specific" is worse than an empty section.
-- **The Borges map**: memory captures the 5% expensive to reconstruct, not the 95% code already encodes. If `rg` can answer it in 10 seconds, don't store it.
-- **The ever-growing diary**: memory is a snapshot, not a timeline. Prune aggressively.
-- **A substitute for code reading**: memory tells agents *which* files to read and *why*, not *what* those files contain.
-- **Speculative notes as facts**: only store what's confirmed. Move uncertainty to Open Questions.
+**Store in memory**: thread state, durable decisions, routing hints ("if working on X, read Y first"), non-obvious constraints, gotchas, rejected alternatives, product intent, scope boundaries.
+
+**Never store**: directory listings, build commands, dependency tables, infrastructure inventory, naming conventions, data flow, error handling approach, evolution logs, code summaries.
 
 ### 1e. Specificity gate
 
@@ -109,7 +113,7 @@ Before writing any memory bank file, apply these self-checks to every sentence:
 - **Substitution test**: Could this sentence describe a different project? If yes, it's filler — make it specific or delete it.
 - **Quantification test**: Does it use "several", "various", "many" without specifics? Replace with an actual list or count, or delete.
 - **Hedge test**: "seems to", "appears to", "might" — verify and state as fact, or move to Open Questions.
-- **Tautology test**: Does it restate the section header? (e.g., "Architecture Overview: This section describes the architecture.") Delete.
+- **Tautology test**: Does it restate the section header? Delete.
 
 **Density test**: Each section must contain at least one proper noun (tool name, file path, pattern name, dependency). A section with zero proper nouns is filler.
 
@@ -121,16 +125,16 @@ Every sentence in a memory bank file must satisfy at least one of:
 3. Captures a decision and its rationale
 4. Identifies a gap or open question
 
-If none apply, delete the sentence. An empty section with "Not yet documented" beats vague prose.
+If none apply, delete the sentence.
 
-**Evidence anchors**: When writing claims in warm files (systemPatterns, techContext, decisions, productContext, progress), add a `Source:` line pointing to where the claim can be verified — a file path, commit hash, or PR number. This is the default for non-obvious claims, not optional. Keep it to one line. Use bare references only (e.g., `Source: adapter/adapter.go`, not `Source: adapter/adapter.go (writeOutput function)`). Never add evidence anchors to essential files (projectBrief, activeContext).
+**Evidence anchors**: When writing claims in warm files (systemPatterns, techContext, decisions), add a `Source:` line pointing to where the claim can be verified — a file path or commit hash. This is required for non-obvious claims. Use bare references only (e.g., `Source: adapter/adapter.go`). Never add evidence anchors to essential files (projectContext, activeState).
 
-**Confidence markers**: When the source of a claim varies in certainty, mark it:
+**Confidence markers**: Mark claims by certainty:
 - `[observed]` — seen directly in code or config
 - `[inferred]` — deduced from structure, naming, or context
 - `[assumed]` — not verified, best guess
 
-Status checks flag `[assumed]` claims as pending verification.
+Only in warm files. Never in essential files.
 
 ### 2. Handle edge cases
 - If `memory-bank/` already exists → ask user: **reinitialize** (overwrite and re-populate from fresh scan), **merge** (update existing files with fresh scan), or **cancel**
@@ -152,108 +156,128 @@ Status checks flag `[assumed]` claims as pending verification.
 
 ### 4. Create memory-bank/
 - Create the `memory-bank/` directory
-- For each of the 7 template files, follow this two-step process:
+- For each of the 5 template files, follow this two-step process:
   1. **Copy**: Read the template from `references/templates/<file>` and write it verbatim to `memory-bank/<file>`
   2. **Fill**: Use the Edit tool to replace each `[fill: ...]` placeholder and HTML comment with real content discovered in Steps 1a-1c
 
-This copy-then-edit workflow ensures the template structure is preserved. The templates contain key-value fields (like `Languages:`), markdown tables, arrow notation, and fixed section headings that MUST appear in the final output.
+This copy-then-edit workflow ensures the template structure is preserved. The templates contain key-value fields (like `Language:`), arrow notation, and fixed section headings that MUST appear in the final output.
 
 **Rules when editing:**
-- **Key-value fields** (e.g., `Languages: [fill: ...]`): replace the `[fill: ...]` placeholder with the real value. Use `none` if not applicable. Do NOT delete the line or convert to bullets.
-- **Tables** (e.g., `| Command | What it does |`): replace `[fill]` cells with real values, or replace the entire table with a one-line explanation if no data exists (e.g., "None — zero external dependencies").
-- **Section headings**: keep exactly as named. Do NOT rename `## Primary Thread` to `## Current Focus` or similar.
-- **Arrow notation** in Component Relationships: replace the comment with real `A -> B : description` lines.
+- **Key-value fields** (e.g., `Language: [fill: ...]`): replace the `[fill: ...]` placeholder with the real value. Do NOT delete the line or convert to bullets.
+- **Section headings**: keep exactly as named. Do NOT rename sections.
+- **Arrow notation** in Component Relationships: replace the placeholder with real `A -> B : description` lines.
+- **Arrow notation** in Key User Flows: replace the placeholder with real `Trigger → Action → Outcome` lines.
 - **HTML comments**: replace with real content. Delete the comment tags but keep the surrounding structure.
 
-Template files: `projectBrief.md`, `productContext.md`, `systemPatterns.md`, `techContext.md`, `activeContext.md`, `progress.md`, `decisions.md`
+Template files: `projectContext.md`, `activeState.md`, `systemPatterns.md`, `techContext.md`, `decisions.md`
 
-`decisions.md` starts mostly empty — its sections are populated over time. Prefer 2-3 concrete sentences over vague placeholders.
+**The `memory-bank/` directory MUST contain ONLY these 5 files.** No additional markdown files, no subdirectories, no supplementary context files. If project-specific context doesn't fit within the 5-file budget, compress — do not create a 6th file. Exception: a `.gitkeep` or `.gitignore` file is permitted for version control purposes.
 
-**Per-file line budgets** (target, not hard cap — 200 is the hard ceiling):
+**Per-file line budgets** (HARD ceilings — no tolerance):
 
-| File | Budget | Notes |
-|------|--------|-------|
-| `projectBrief.md` | 80 | Essential. Elaboration → productContext or systemPatterns |
-| `activeContext.md` | 70 | Essential. Combined with projectBrief ≤ 150 |
-| `productContext.md` | 80 | Warm. Stable context, keep tight |
-| `systemPatterns.md` | 120 | Warm. Most structured — tables/arrows need room |
-| `techContext.md` | 100 | Warm. Commands/deps tables take space |
-| `progress.md` | 80 | Warm. Roll up old items aggressively |
-| `decisions.md` | 150 | Warm. Append-only — compress formatting, not content |
-| **Total** | **680** | ~9,000 tokens across all 7 files |
+| File | Hard Ceiling | Notes |
+|------|-------------|-------|
+| `projectContext.md` | 80 lines | Essential. |
+| `activeState.md` | 70 lines | Essential. Combined with projectContext ≤ 150. |
+| `systemPatterns.md` | 100 lines | Warm. |
+| `techContext.md` | 60 lines | Warm. |
+| `decisions.md` | 150 lines | Warm. Append-only. |
+| **Total** | **460 lines** | |
+
+If any file exceeds its ceiling after population, compress before proceeding. There is no "marginally over" tolerance. The ceiling IS the maximum.
 
 **Filling guidance by file** (what to include vs. exclude):
 
-- **projectBrief.md** — project name from manifest/repo. Overview from README + entry point analysis. Core requirements from README or docs.
-  - *Include*: what the repo is, core scope, major modules, stable stakeholders
-  - *Exclude*: session state, recent work, tactical priorities
+- **projectContext.md** — project identity, intent, and scope in one document. Project name from manifest/repo. Overview from README + entry point analysis. Purpose: why the project exists. Target audience from README/docs. Core requirements from README or docs. Key user flows from route definitions or CLI commands (arrow notation required). Scope from README or inferred.
+  - *Include*: what the project is, why it exists, who it's for, core requirements, success criteria, scope boundaries
+  - *Exclude*: technical implementation details, session state, build commands, dependency lists
   - Rewrite rarely
 
-- **productContext.md** — purpose and audience from README/docs. Key user flows from route definitions, page structure, or CLI commands.
-  - *Include*: who this serves, what outcomes matter, stable product constraints, UX goals
-  - *Exclude*: open brainstorming, temporary prioritization churn
-
-- **systemPatterns.md** — benefits most from deep analysis. Architecture from directory structure + entry points. Design patterns from code inspection. Component relationships from imports/directory organization. Data flow from tracing entry point to core modules. Naming conventions and error handling from observed code. Optionally add `Source:` lines for non-obvious architectural claims.
-  - *Include*: how components fit together, recurring patterns, lifecycle norms, naming/error-handling conventions
-  - *Exclude*: one-off features, current sprint specifics, every module detail
-  - Update only when patterns change
-
-- **techContext.md** — stack from manifests. Build & dev setup from scripts/Makefile. Development commands verbatim from package.json scripts or equivalent. Key dependencies with brief inferred rationale. Infrastructure from Docker/CI configs. Optionally add `Source:` lines for non-obvious technical claims.
-  - *Include*: stack, build commands, major dependencies, configuration model, hard constraints
-  - *Exclude*: transient dependency upgrades, session-local setup, machine-specific quirks
-
-- **activeContext.md** — current focus from recent git history. Recent changes from git log. Next steps inferred from recent commit trajectory.
-  - *Include*: primary thread, current focus, blockers, next concrete move, working set, last 2-3 meaningful updates
-  - *Exclude*: long chronology, deep background, stale repo-state snapshots, finished work older than a few sessions
+- **activeState.md** — session handoff document. An agent reading ONLY this file and projectContext.md MUST know what to work on next.
+  - *Include*: exact next action (Resume Here), current workstream, 3-5 working set files, in-progress items, remaining work, blockers, known issues, open questions
+  - *Exclude*: completed work, recent changes log, evolution timeline, deep background
   - Rewrite aggressively every update
 
-- **progress.md** — completed work from git history and project maturity. In progress from recent commits and uncommitted changes. Known issues from TODO/FIXME/HACK comments if spotted.
-  - *Include*: what's done, what's in progress, what remains, known issues
-  - *Exclude*: fine-grained session diary, repeated summaries already in activeContext
+- **systemPatterns.md** — architecture and design intent. HOW things fit together and WHY. Benefits most from deep analysis.
+  - *Include*: architecture type/shape, entry points, layer structure, key design decisions with rationale, non-obvious design patterns, component relationships (arrow notation), gotchas and traps
+  - *Exclude*: naming conventions, data flow descriptions, error handling approach, code summaries, one-off features
+  - Update only when patterns change
 
-- **decisions.md** — mostly empty. If obvious architectural decisions are visible (choice of ORM, state management, monorepo structure), log as retroactive entries with today's date. Include an optional `Source:` line pointing to the file path, commit hash, or PR number that supports the decision. Each reference must be something the status command can verify — avoid non-checkable references like "git log" or "code review".
-  - *Include*: decision, rationale, scope, status, rejected alternatives, optional Source line
-  - *Exclude*: vague observations, temporary chatter, implementation details easy to rediscover
+- **techContext.md** — non-obvious technical constraints ONLY. Does NOT inventory the tech stack.
+  - *Include*: language + runtime (routing hints), constraints that will break code if unknown, setup gotchas not in README, environment quirks not in config files
+  - *Exclude*: build commands, dependency tables, infrastructure fields, framework/test runner/bundler/linter/package manager fields, environment variables already in config
+  - Update when constraints change
+
+- **decisions.md** — decisions, rejected alternatives, intentional patterns. The highest-value non-derivable content.
+  - *Include*: key decisions with date/rationale/scope/status/source, rejected alternatives (≥1 on init), intentional patterns that look wrong but are correct
+  - *Exclude*: vague observations, implementation details, code summaries
   - Append-only, compress formatting if it grows
 
-- If a section has no discoverable info, leave it with a brief "Not yet documented" note rather than the HTML comment
-- **Additional context files**: If the project is complex enough that a topic doesn't fit cleanly into the 7 core files (e.g., detailed API specs, multi-service integration docs, complex deployment procedures), create additional `.md` files in `memory-bank/`. Mention these in the summary output. Most projects won't need this.
+- If a section has no discoverable content:
+  - Write `None identified` (for Blockers, Known Issues, Gotchas, Setup Gotchas, Environment Quirks)
+  - Write `No active thread` or equivalent factual statement (for Resume Here, Primary Thread, In Progress)
+  - NEVER leave a section heading with no content below it
+  - NEVER use `Not yet documented`
 
-### 4b. Format verification (MANDATORY)
+### 4b. Format verification (MANDATORY — 44 checks, ALL must pass)
 
-After writing all 7 files, re-read each one and verify the following. If any check fails, edit the file to fix it before proceeding to step 5. Do not skip this step.
+After writing all 5 files, re-read each one and verify every check below. If ANY check fails, edit the file to fix it before proceeding. Do not skip this step.
 
-**techContext.md**:
-- `## Tech Stack` contains `Languages:`, `Framework:`, `Test runner:`, `Bundler:`, `Package manager:` as key-value fields (not bullets or prose)
-- `## Infrastructure` contains `Hosting:`, `CI/CD:`, `Database:`, `External services:` as key-value fields
-- `## Development Commands` uses a `| Command | What it does |` markdown table (or a one-liner explaining why no commands exist, e.g., "No build commands — open index.html directly")
-- `## Dependencies` uses a table or explicitly states "None" / "Zero external dependencies"
+#### File-Level Checks (6 checks)
+- [ ] Exactly 5 `.md` files exist in `memory-bank/` — no more, no fewer
+- [ ] No non-core files in `memory-bank/` (only exception: `.gitkeep`, `.gitignore`)
+- [ ] No file exceeds its hard ceiling (projectContext ≤80, activeState ≤70, systemPatterns ≤100, techContext ≤60, decisions ≤150)
+- [ ] Essential files combined (projectContext + activeState) ≤ 150 lines
+- [ ] Total all files ≤ 460 lines
+- [ ] No subdirectories in `memory-bank/`
 
-**systemPatterns.md**:
-- `## Architecture Overview` contains `Type:`, `Entry point(s):`, `Layer structure:` as key-value fields (not a prose paragraph)
-- `## Component Relationships` uses `A -> B : description` arrow notation (not prose descriptions)
-- `## Naming Conventions` uses a `| Scope | Convention | Example |` markdown table
-- At least one `Source:` line exists somewhere in the file
+#### Derivability Gate Checks (11 checks)
+- [ ] No build/dev command tables in any file
+- [ ] No dependency lists or tables in any file
+- [ ] No infrastructure inventory fields (Hosting, CI/CD, Database, External services)
+- [ ] No naming convention tables in any file
+- [ ] No data flow sections in any file
+- [ ] No error handling sections in any file
+- [ ] No evolution/changelog entries in any file
+- [ ] No completed work items in activeState.md
+- [ ] No recent changes list in activeState.md
+- [ ] No framework/runner/bundler/linter/package-manager fields in techContext.md
+- [ ] No code summaries (what a function does, what a module contains)
 
-**activeContext.md**:
-- Uses these exact section names: `## Primary Thread`, `## Resume Here`, `## Working Set`, `## Blockers`, `## Recent Changes`
-- `## Resume Here` names a specific file, function, or task
-- `## Working Set` lists 3-5 specific files
+#### Structural Checks (17 checks)
+- [ ] projectContext.md has all 7 required section headings: `## Identity`, `## Purpose`, `## Target Audience`, `## Core Requirements`, `## Success Criteria`, `## Key User Flows`, `## Scope` (with `### In Scope` and `### Out of Scope`)
+- [ ] activeState.md has all 8 required section headings: `## Resume Here`, `## Primary Thread`, `## Working Set`, `## In Progress`, `## Remaining`, `## Blockers`, `## Known Issues`, `## Open Questions`
+- [ ] systemPatterns.md has all 5 required section headings: `## Architecture Overview`, `## Key Design Decisions`, `## Design Patterns`, `## Component Relationships`, `## Gotchas & Traps`
+- [ ] techContext.md has all 4 required section headings: `## Stack`, `## Non-Obvious Constraints`, `## Setup Gotchas`, `## Environment Quirks`
+- [ ] decisions.md has all 3 required section headings: `## Key Decisions`, `## Rejected Alternatives`, `## Intent & Patterns`
+- [ ] No additional section headings beyond those specified above
+- [ ] All key-value fields use `Key: value` format — not bullets, not bold labels, not prose
+- [ ] Component Relationships uses arrow notation `->` (not prose)
+- [ ] Key User Flows uses arrow notation `→` (not numbered steps)
+- [ ] Resume Here names a specific file, function, or task (not generic)
+- [ ] Working Set contains 3-5 file paths
+- [ ] Every Key Decision entry has all 4 required lines: date+decision, Scope, Status, Source
+- [ ] Decision dates are commit dates, not analysis dates (use earliest evidencing commit if unknown)
+- [ ] ≥1 Rejected Alternative entry with all 3 required lines (`**What was considered**`, `**Why rejected**`, `**Reconsider if**`)
+- [ ] No section heading has empty content below it
+- [ ] No `[fill:]` placeholders remain
+- [ ] No `Not yet documented` appears anywhere
 
-**decisions.md**:
-- Each entry in Key Decisions has `Scope:` and `Status:` lines immediately after the decision line
-- No template example text remains (e.g., "Use SQLite over PostgreSQL")
+#### Evidence Checks (5 checks)
+- [ ] systemPatterns.md, techContext.md, decisions.md each have ≥1 `Source:` line
+- [ ] Every `Source:` reference points to a file that exists in the project
+- [ ] Warm files use confidence markers `[observed]`, `[inferred]`, or `[assumed]` on claims
+- [ ] Essential files (projectContext, activeState) contain zero `Source:` lines
+- [ ] Essential files contain zero confidence markers
 
-**productContext.md**:
-- `## Key User Flows` uses `→` or `->` arrow notation, one flow per line (not numbered sequential steps)
+#### Specificity Checks (5 checks)
+- [ ] No sentence passes the substitution test (could describe a different project)
+- [ ] No unquantified vague terms ("several", "various", "many", "some")
+- [ ] No hedging language ("seems to", "appears to", "might") outside Open Questions
+- [ ] No tautologies (sentence restates its section heading)
+- [ ] Every section contains ≥1 proper noun (file path, tool name, pattern name, dependency, config key)
 
-**Warm files** (systemPatterns, techContext, decisions, productContext, progress):
-- Each file has at least one `Source:` line with a bare reference (file path, commit hash, or PR)
-- Each file has at least one confidence marker (`[observed]`, `[inferred]`, or `[assumed]`)
-
-**Essential files** (projectBrief, activeContext):
-- No `Source:` lines
-- No confidence markers
+**Total: 44 checks. All 44 must pass.**
 
 ### 5. Create/update agent config
 
@@ -262,9 +286,9 @@ Read the snippet from the skill's `references/agent-config-snippet.md`.
 Detect which agent is executing this skill and update the appropriate config file:
 
 - **Claude Code** → `CLAUDE.md`
-  - Add `@memory-bank/projectBrief.md` and `@memory-bank/activeContext.md` as auto-loading imports
-  - Add the on-demand files as a reference list (without `@` prefix) so the agent knows they exist but doesn't auto-load them
-  - If no `CLAUDE.md` exists → create one with the snippet content (using `@` imports for essential files)
+  - Add `@memory-bank/projectContext.md` and `@memory-bank/activeState.md` as auto-loading imports
+  - Add the warm file loading triggers (without `@` prefix) so the agent knows when to load them
+  - If no `CLAUDE.md` exists → create one with the snippet content
   - If `CLAUDE.md` exists → append the snippet to the end (never overwrite existing content)
 
 - **Codex** → `AGENTS.md`
@@ -276,7 +300,7 @@ Detect which agent is executing this skill and update the appropriate config fil
 
 ### 6. Summary
 - Print a summary of what was created/modified
-- List all files created in memory-bank/
+- List all 5 files created in memory-bank/
 - Note which agent config file was created or updated
 - Mention available subcommands: update, status, export, ignore, track, purge
-- Remind user that essential memory bank files are loaded at the start of each session via agent config imports, with other files loaded on demand
+- Remind user that 2 essential files are auto-loaded at session start, with 3 warm files loaded on demand

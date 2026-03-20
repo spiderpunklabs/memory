@@ -1,40 +1,26 @@
 # Tech Context
 
-<!-- Budget: 100 lines max. -->
+<!-- Budget: 60 lines max. Warm file — requires Source: lines and confidence markers. -->
+<!-- PROHIBITED: build command tables, dependency tables, infrastructure fields,
+     framework/runner/bundler/linter/package-manager fields. These are derivable from
+     config files — do NOT store them in memory. -->
 
-## Tech Stack
-<!-- Fill in each field. Use "none" if not applicable. Do NOT convert to bullets or prose. -->
-Languages: [fill: e.g., TypeScript, Python, Go]
-Framework: [fill: e.g., Next.js, Django, or "none"]
-Test runner: [fill: e.g., Jest, pytest, or "none"]
-Bundler: [fill: e.g., Vite, webpack, or "none"]
-Linter/formatter: [fill: e.g., ESLint + Prettier, or "none"]
-Package manager: [fill: e.g., npm, pip, or "none"]
+## Stack
+<!-- Only Language and Runtime. All other stack details are derivable from config files. -->
+Language: [fill: language and dialect/constraints, e.g., "Rust (kernel, #![no_std])" or "TypeScript (strict mode)"]
+Runtime: [fill: runtime environment, e.g., "Linux kernel space", "Node 20", "Browser (ES2020+)"]
 
-## Build & Dev Setup
-<!-- How to install dependencies, run dev server, build for production. 2-3 lines max. -->
+## Non-Obvious Constraints
+<!-- Things that will break code if you don't know them. NOT a tech stack summary. -->
+<!-- Each entry: what the constraint is + WHY it matters + what breaks if violated. -->
+- [fill: constraint] [observed|inferred]
 
-## Development Commands
-<!-- Fill table rows. If no commands, replace table with: "No build commands — [describe workflow]" -->
-| Command | What it does |
-|---------|-------------|
-| [fill] | [fill] |
+Source: [fill: source file]
 
-## Dependencies
-<!-- Fill table if ≥1 dependency (max 8). If zero deps, replace table with: "None — zero external dependencies" -->
-| Dependency | Role | Why chosen |
-|-----------|------|-----------|
-| [fill] | [fill] | [fill] |
+## Setup Gotchas
+<!-- Requirements not covered in README or standard documentation. -->
+- [fill: gotcha, or "None — README covers setup"]
 
-## Environment & Configuration
-<!-- Environment variables, config files, feature flags (no secrets) -->
-
-## Infrastructure
-<!-- Fill in each field. Use "none" if not applicable. Do NOT convert to bullets or prose. -->
-Hosting: [fill: e.g., Vercel, AWS, or "none"]
-CI/CD: [fill: e.g., GitHub Actions, or "none"]
-Database: [fill: e.g., PostgreSQL, or "none"]
-External services: [fill: e.g., Stripe, SendGrid, or "none"]
-
-## Constraints & Limitations
-<!-- Technical constraints: browser support, runtime requirements, performance budgets -->
+## Environment Quirks
+<!-- Config, env vars, or setup details not in any config file. -->
+- [fill: quirk, or "None"]

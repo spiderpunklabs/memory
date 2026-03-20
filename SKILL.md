@@ -1,14 +1,14 @@
 ---
 name: memory
 description: >-
-  Persistent project memory for AI coding agents. Maintains structured markdown
-  files (project brief, system patterns, tech context, progress, decisions) that
-  survive between sessions. Use when the user says "memory init", "memory update",
-  "memory status", "memory export", "memory ignore", "memory track",
-  "memory purge", "initialize memory bank", "setup memory bank",
+  Persistent project memory for AI coding agents. Maintains 5 structured markdown
+  files (project context, active state, system patterns, tech context, decisions)
+  that survive between sessions. Use when the user says "memory init",
+  "memory update", "memory status", "memory export", "memory ignore",
+  "memory track", "memory purge", "initialize memory bank", "setup memory bank",
   "create memory bank", "update memory bank", "check memory status",
   or "update project context".
-version: 0.2.8
+version: 0.2.9
 ---
 
 # memory — Project Memory Bank

@@ -1,21 +1,25 @@
 # Decisions
 
 <!-- Append-only log. Never remove entries. Budget: 150 lines max. -->
+<!-- Warm file — requires Source: lines and confidence markers. -->
 
 ## Key Decisions
-<!-- Each entry MUST include Scope and Status lines. Delete this comment block when filling.
-Format:
-YYYY-MM-DD: **Decision title** — rationale
-Scope: what area this applies to
-Status: active
-Source: file path or commit (optional)
+<!-- REQUIRED format per entry (all 4 lines mandatory):
+YYYY-MM-DD: **Decision** — rationale
+Scope: <affected area>
+Status: active | superseded | revisit
+Source: <file or commit>
 -->
 
 ## Rejected Alternatives
-<!-- Format:
-YYYY-MM-DD: **Rejected: approach** — reason it was rejected
-Scope: what area this applies to
+<!-- REQUIRED: ≥1 entry on init. Every decision implies a rejected path.
+Format per entry (all 3 lines mandatory):
+**What was considered**: <alternative>
+**Why rejected**: <reason>
+**Reconsider if**: <condition, or "N/A">
 -->
 
-## Project-Specific Patterns
-<!-- Learned behaviors specific to this project that aren't obvious from code -->
+## Intent & Patterns
+<!-- Code that looks wrong but is intentional. Project-specific conventions. -->
+<!-- Each entry: what it looks like + why it's correct. -->
+- [fill: pattern — explanation] [observed]
