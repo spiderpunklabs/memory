@@ -293,8 +293,9 @@ Detect which agent is executing this skill and update the appropriate config fil
 
 - **Codex** → `AGENTS.md`
   - Use plain file path references (no `@` prefix)
-  - If no `AGENTS.md` exists → create one with the snippet content
-  - If `AGENTS.md` exists → append the snippet to the end (never overwrite existing content)
+  - When using the snippet content, strip the leading `@` from any file references (e.g., `@memory-bank/projectContext.md` → `memory-bank/projectContext.md`)
+  - If no `AGENTS.md` exists → create one with the transformed snippet content
+  - If `AGENTS.md` exists → append the transformed snippet to the end (never overwrite existing content)
 
 - **Other agents** (Cursor, Windsurf, etc.) → use whichever config file the agent convention expects, falling back to `AGENTS.md`
 

@@ -8,7 +8,7 @@ Update the memory bank files to reflect the current state of work.
 
 **If `memory-bank/projectBrief.md` exists** (old 7-file structure detected):
 
-Inform the user: "Detected v0.2.8 memory bank (7 files). Migrating to v0.2.9 (5 files)."
+Inform the user: "Detected v0.2.8 memory bank (7 files). Migrating to v0.2.10 (5 files)."
 
 1. Read all existing files in `memory-bank/`
 2. Merge `projectBrief.md` + `productContext.md` → `projectContext.md`:
@@ -79,7 +79,7 @@ Read all 5 files in `memory-bank/`:
 - If the new text contradicts the old → verify the change before overwriting, and add a `Source:` line
 - If the new text is >80% similar to the old → skip the rewrite, don't churn files
 
-**Format migration (MANDATORY)**: If existing content uses formats from v0.2.8 that don't match v0.2.9 templates, migrate:
+**Format migration (MANDATORY)**: If existing content uses formats from v0.2.8 that don't match v0.2.10 templates, migrate:
 - Old Tech Stack multi-field block → strip to Language: + Runtime: only
 - Old Infrastructure fields → remove entirely
 - Old Development Commands table → remove entirely

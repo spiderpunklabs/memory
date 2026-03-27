@@ -18,3 +18,5 @@ Consolidate all 5 memory bank files into a single markdown document.
    - **Write to file** — save as `memory-bank-export.md` in the current directory
 
 4. **Report**: Note the total size and number of sections exported
+
+> **Note**: The purge command performs its own inline backup without invoking this command. This command is for user-initiated exports only.

@@ -91,7 +91,7 @@ For empty projects, provide a description:
 /memory update
 ```
 
-Re-scans git history and project state. Updates `activeState.md` and any other files that need refreshing. Automatically migrates v0.2.8 memory banks (7 files) to v0.2.9 format (5 files).
+Re-scans git history and project state. Updates `activeState.md` and any other files that need refreshing. Automatically migrates v0.2.8 memory banks (7 files) to v0.2.10 format (5 files).
 
 ### Check health
 
