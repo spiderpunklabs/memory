@@ -9,5 +9,5 @@ Remove `memory-bank/` from `.gitignore` to resume git-tracking the memory bank.
 3. **Remove `memory-bank/` from `.gitignore`**:
    - Use Edit tool to remove the line containing `memory-bank/`
    - Also remove any blank lines this creates
-4. **Stage files**: Inform the user: "Staging memory bank files with `git add memory-bank/`." Then run the command.
+4. **Stage files**: Show the user the files in `memory-bank/` that will be staged. Ask: "These files will be added to git tracking. Proceed? (y/n)". Only run `git add memory-bank/` after user confirmation.
 5. **Report**: Confirm memory bank is now git-tracked

@@ -2,7 +2,12 @@
 
 Strict validation of the memory bank. Read-only — does not modify any files.
 
-Every check produces PASS or FAIL. The final line is either `STATUS: ALL CHECKS PASSED` or `STATUS: N FAILURES DETECTED`.
+Every check produces PASS, FAIL, or WARNING. Checks are categorized by severity:
+- **BLOCKING**: Must fix. Memory bank is unreliable until resolved.
+- **WARNING**: Should fix. Won't break functionality but degrades quality.
+- **INFO** (heuristic): Requires human judgment. Flagged for review, not auto-repairable.
+
+The final line is `STATUS: ALL CHECKS PASSED`, `STATUS: N FAILURES DETECTED`, or `STATUS: N FAILURES, M WARNINGS`.
 
 ## Steps
 
@@ -24,13 +29,13 @@ Count commits since each file was last modified (`git rev-list --count <last-com
 - **Stale**: 11-20 commits since last update
 - **Critical**: >20 commits since last update
 
-### 4. Run all 44 validation checks
+### 4. Run all 47 validation checks
 
-Each check produces `PASS` or `FAIL` with the specific violation.
+Each check produces `PASS`, `FAIL` (blocking), or `WARNING` with the specific violation and a recommended action.
 
 #### File-Level Checks (6 checks)
 1. File count = exactly 5 `.md` files in `memory-bank/`
-2. No non-core files in `memory-bank/` (exception: `.gitkeep`, `.gitignore`)
+2. No non-core files in `memory-bank/` (exception: `.gitkeep`, `.gitignore`, `.memory-bank.lock/`, `.*.tmp`)
 3. Per-file line budgets: projectContext ≤80, activeState ≤70, systemPatterns ≤100, techContext ≤60, decisions ≤150
 4. Essential combined (projectContext + activeState) ≤ 150 lines
 5. Total all files ≤ 460 lines
@@ -61,33 +66,39 @@ Each check produces `PASS` or `FAIL` with the specific violation.
 26. Key User Flows uses `→` arrow notation
 27. Resume Here names a specific file, function, or task (not generic statements like "review the codebase")
 28. Working Set contains 3-5 file paths
-29. Every Key Decision entry has all 4 required lines: date+decision, Scope:, Status:, Source:
-30. Decision dates are commit dates, not analysis dates
-31. ≥1 Rejected Alternative entry with all 3 required lines: `**What was considered**`, `**Why rejected**`, `**Reconsider if**`
-32. No section heading has empty content below it
-33. No `[fill:]` placeholders remain
-34. No `Not yet documented` appears anywhere
+29. Every Key Decision entry uses a valid format: EITHER the 4-line active format (date+decision, Scope:, Status:, Source:) for active/revisit entries, OR the 1-line compact format (`~~date: decision~~ → superseded by <date> | Scope: <area>`) for superseded entries only
+30. [WARNING] No superseded decision uses 4-line format when decisions.md exceeds 120 lines — recommended: run `memory compact` to free space
+31. Decision dates are commit dates, not analysis dates
+32. ≥1 Rejected Alternative entry with all 3 required lines: `**What was considered**`, `**Why rejected**`, `**Reconsider if**` (merged entries with shared rejection reasons are valid)
+33. No section heading has empty content below it
+34. No `[fill:]` placeholders remain
+35. No `Not yet documented` appears anywhere
 
 #### Evidence Checks (5 checks)
-35. systemPatterns.md, techContext.md, decisions.md each have ≥1 `Source:` line
-36. Every `Source:` reference points to a file that exists in the project
-37. Warm files use confidence markers (`[observed]`, `[inferred]`, or `[assumed]`) on claims
-38. Essential files (projectContext, activeState) contain zero `Source:` lines
-39. Essential files contain zero confidence markers (`[observed]`, `[inferred]`, `[assumed]`)
+36. systemPatterns.md, techContext.md, decisions.md each have ≥1 `Source:` line
+37. Every `Source:` reference points to a valid target: if it looks like a file path (contains `/` or `.`), verify the file exists; if it looks like a commit hash (7+ hex chars), verify with `git cat-file -t <hash>`; otherwise FAIL with "unrecognized Source format"
+38. Warm files use confidence markers (`[observed]`, `[inferred]`, or `[assumed]`) on claims
+39. Essential files (projectContext, activeState) contain zero `Source:` lines
+40. Essential files contain zero confidence markers (`[observed]`, `[inferred]`, `[assumed]`)
 
-#### Specificity Checks (5 checks)
-40. No sentence could describe a different project (substitution test)
+#### Specificity Checks (5 checks — checks 41, 43 are deterministic; checks 44, 45, 46 are heuristic/INFO)
 41. No unquantified vague terms ("several", "various", "many", "some")
 42. No hedging language ("seems to", "appears to", "might") outside Open Questions
-43. No tautologies (sentence restates its section heading)
-44. Every section contains ≥1 proper noun (file path, tool name, pattern name, dependency, config key)
+43. [INFO/heuristic] No sentence could describe a different project (substitution test) — requires human judgment
+44. [INFO/heuristic] No tautologies (sentence restates its section heading) — requires human judgment
+45. [INFO/heuristic] Every section contains ≥1 proper noun (file path, tool name, pattern name, dependency, config key) — requires human judgment
 
-### 5. Cross-file consistency checks
+#### Security Checks (2 checks)
+46. [BLOCKING] No memory bank file contains common secret patterns: `sk-`, `ghp_`, `AIza`, `AKIA`, `-----BEGIN`, `password=`, `token=`, `secret=`, `PRIVATE KEY`, connection strings (`postgres://`, `mysql://`, `mongodb://`)
+47. [BLOCKING] No `Source:` or Working Set path escapes the git repository root (paths traversing `../` are allowed IF they resolve to a file within the git root; absolute paths outside the project are blocked)
+
+### 5. Cross-file consistency checks (concrete signals)
 Report as informational alongside the pass/fail checks:
-- Does `activeState.md` align with `decisions.md`? (active decisions referenced)
-- Does `techContext.md` constraints match actual manifests?
-- Does `systemPatterns.md` architecture match actual directory structure?
-- Does `projectContext.md` scope align with README.md?
+- Every path in `activeState.md` Working Set exists in the project filesystem
+- The file or function named in `activeState.md` Resume Here exists in the project
+- Decision `Scope:` values in `decisions.md` reference components that appear in `systemPatterns.md` Component Relationships
+- `techContext.md` constraints match actual manifests (constraints should reflect reality)
+- `systemPatterns.md` architecture matches actual directory structure
 
 ### 6. Evidence and confidence summary
 - Count total `Source:` anchors across warm files
@@ -110,16 +121,24 @@ Memory Bank Status:
     Essential combined: NN/150 lines
     Total: NN/460 lines
 
-  Validation (44 checks):
+  Validation (47 checks):
     File-Level:       N/6  passed
     Derivability:     N/11 passed
-    Structural:       N/17 passed
+    Structural:       N/18 passed  (includes 1 WARNING-level check)
     Evidence:         N/5  passed
-    Specificity:      N/5  passed
+    Specificity:      N/5  passed  (3 heuristic/INFO — require human review)
+    Security:         N/2  passed
 
-    Failures:
+    Blocking Failures:
       FAIL #NN: <description of violation>
-      FAIL #NN: <description of violation>
+        → Action: <recommended fix>
+
+    Warnings:
+      WARN #30: <description>
+        → Action: Run `memory compact` for guided compression
+
+    Heuristic (INFO — human review needed):
+      INFO #43: <flagged content for review>
 
   Evidence:
     NN anchors across 3 warm files
@@ -148,10 +167,12 @@ STATUS: N FAILURES DETECTED
 - [ ] Per-file lines in `NN/ceiling` format for all 5 files
 - [ ] Essential combined line count
 - [ ] Total line count with /460 budget
-- [ ] All 44 checks reported with pass/fail counts per category
-- [ ] Any failures listed individually with check number and description
+- [ ] All 47 checks reported with pass/fail/warn counts per category
+- [ ] Blocking failures listed with check number, description, and recommended action
+- [ ] Warnings listed separately from blocking failures
+- [ ] Heuristic/INFO checks flagged for human review (not counted as failures)
 - [ ] Evidence section with anchor count and broken references
 - [ ] Confidence section with marker counts and assumed claims listed
-- [ ] Consistency section
+- [ ] Consistency section with concrete cross-file signals
 - [ ] Staleness summary
-- [ ] Final STATUS line (ALL CHECKS PASSED or N FAILURES DETECTED)
+- [ ] Final STATUS line (ALL CHECKS PASSED, N FAILURES DETECTED, or N FAILURES M WARNINGS)

@@ -3,7 +3,9 @@
 <!-- Budget: 60 lines max. Warm file — requires Source: lines and confidence markers. -->
 <!-- PROHIBITED: build command tables, dependency tables, infrastructure fields,
      framework/runner/bundler/linter/package-manager fields. These are derivable from
-     config files — do NOT store them in memory. -->
+     config files — do NOT store them in memory.
+     NEVER store actual values of env vars, API keys, tokens, or connection strings.
+     Store only variable NAMES and why they matter. -->
 
 ## Stack
 <!-- Only Language and Runtime. All other stack details are derivable from config files. -->

@@ -115,7 +115,7 @@ Per-file guidance:
 - **decisions.md** — append any significant decisions or rejected alternatives from this session
   - *Include*: decision with date/rationale/scope/status/source, rejected alternatives with 3-line format, intentional patterns
   - *Exclude*: vague observations, implementation details
-  - Append-only, compress formatting if it grows
+  - Append-only. When the file exceeds 120 lines, trigger the interactive compaction flow (step 6b)
 
 - **systemPatterns.md** — update if new patterns, architecture decisions, or design changes were made
   - *Include*: architecture shape, design decisions with rationale, non-obvious patterns, component relationships, gotchas
@@ -149,9 +149,23 @@ Review the work done in this session for significant decisions:
 - Learned behaviors or non-obvious project rules → **Intent & Patterns**
 
 When updating existing decisions:
-- Never remove entries
-- You may update the Status field (e.g., marking it superseded)
-- Compress formatting if the file grows long, but preserve all decision content
+- Never remove entries without explicit user approval
+- You may update the Status field (e.g., active → superseded, active → revisit)
+- When decisions.md exceeds 120 lines, run step 6b (interactive compaction)
+- Never auto-compress decisions — always ask the user first
+
+### 6b. Interactive compaction (only when decisions.md exceeds 120 lines)
+1. Count lines in decisions.md. If ≤120, skip this step entirely.
+2. List all entries with `Status: superseded`, showing: date, decision title, scope.
+3. Present to user:
+   > "decisions.md is at **[N]/150 lines**. [M] superseded decisions can be compacted.
+   > For each, choose: **(a) Compact** to 1-line format **(b) Keep** full format **(c) Remove** entirely"
+4. Apply user's choices. Compact format (1 line):
+   `~~YYYY-MM-DD: Decision~~ → superseded by <date> | Scope: <area>`
+5. If still over 140 lines: present Rejected Alternative entries with shared rejection reasons and ask if they can be merged into combined entries.
+6. If still over 150 lines after user-directed compression: warn the user and suggest running `memory compact` for a deeper guided review. **DO NOT silently truncate or abbreviate.**
+
+**Exception**: if the user explicitly chose to keep entries in full format, the file may temporarily exceed its ceiling. Flag this in the next `memory status` as a WARNING (not BLOCKING), with the recommendation to run `memory compact`.
 
 ### 7. Consolidate to prevent bloat
 
@@ -167,34 +181,50 @@ When updating existing decisions:
 | **Essential combined** | **150 lines** |
 | **Total** | **460 lines** |
 
-If any file exceeds its ceiling, compress before completing. There is no "marginally over" tolerance.
+If any file exceeds its ceiling, compress before completing. There is no "marginally over" tolerance — except for decisions.md when the user explicitly chose to keep entries in full format during step 6b (flagged as WARNING in next `memory status`).
 
 **Compression heuristics**:
 - If activeState.md reads like a timeline → rewrite as handoff (step 5)
 - If a note is no longer action-guiding → remove from memory
 - If a fact is easy to verify from code → shorten or delete from memory
 - If a decision matters across workstreams → ensure it's in decisions.md, remove from activeState
-- If any file exceeds its ceiling → compress until it's under
+- If decisions.md exceeds ceiling → run step 6b (interactive compaction with user approval)
+- For all other files exceeding ceiling → compress until under
 
 **The `memory-bank/` directory MUST contain ONLY the 5 core files.** Do NOT create additional files. If content doesn't fit, compress.
 
+### 7b. Secret/PII preflight (runs BEFORE writing any file)
+Scan all candidate content for secret patterns: `sk-`, `ghp_`, `AIza`, `AKIA`, `-----BEGIN`, `password=`, `token=`, `secret=`, connection strings (`postgres://`, `mysql://`, `mongodb://`).
+If detected: **STOP**. Show the user what was detected. Ask:
+- "Detected potential secret: `[pattern]` at [location]. Redact before writing? (y/n)"
+- Default to redaction. Only write unredacted with explicit user confirmation.
+
 ### 8. Update files
-- Use the Edit tool to update each file that needs changes
-- Preserve existing content in decisions.md — append or modify, don't delete
+
+**Concurrency guard**: Before writing, check `git -C <project-root> status -- memory-bank/` for external modifications. If files have been modified outside this session, warn the user and re-read all files before proceeding.
+
+**Write protocol** (applies to each file write):
+1. Record current file content as snapshot (hold in context)
+2. Write the new content
+3. Validate: correct section headings present, within line ceiling, required fields present
+4. If validation fails → restore snapshot content, report the failure, ask user how to proceed
+5. Only proceed to next file after current file passes validation
+
+- Preserve existing content in decisions.md — append or modify, don't delete without user approval
 - Keep entries concise and factual
+- Review `[assumed]` confidence markers: if evidence now exists, promote to `[observed]`; if disproven, remove the claim
 
 ### 9. Verify consistency and format
 
-**Cross-file consistency checks:**
-- Does `activeState.md` align with `decisions.md`? (active decisions should be in decisions.md)
-- Does `techContext.md` match actual manifests? (constraints should reflect reality)
-- Does `systemPatterns.md` match actual directory structure? (architecture should be current)
-- Does `projectContext.md` align with README.md? (scope should be consistent)
-- Check evidence anchors: if any `Source:` line references a file that no longer exists, update or remove
+**Cross-file consistency checks** (concrete signals):
+- Every path in `activeState.md` Working Set exists in the project filesystem
+- The file/function named in `activeState.md` Resume Here exists in the project
+- Decision `Scope:` values in `decisions.md` reference components that appear in `systemPatterns.md` Component Relationships
+- Every `Source:` reference points to a file that still exists — if not, update or remove
+- `techContext.md` constraints match actual manifests (constraints should reflect reality)
 
-**Format verification (44 checks — ALL must pass):**
-
-Run the same 44-check verification as init (see init.md step 4b). Fix any failures before reporting.
+**Format verification — run the checks defined in `references/commands/status.md`.**
+Fix any failures before reporting. Do not duplicate the check list here — status.md is the single authoritative spec.
 
 ### 10. Report
 - List which files were updated and summarize key changes

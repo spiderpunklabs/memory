@@ -149,6 +149,12 @@ Only in warm files. Never in essential files.
 - If directory is empty AND description provided → use the description as seed context (skip questions)
 - If in a subdirectory of a monorepo → create memory-bank/ at cwd, not at git root
 
+**Monorepo detection**: If cwd ≠ `git rev-parse --show-toplevel`:
+1. Check git root for workspace indicators: `lerna.json`, `pnpm-workspace.yaml`, `package.json` with `workspaces` field, `Cargo.toml` with `[workspace]` section, `go.work`, or `packages/`/`apps/`/`services/`/`libs/` dirs containing manifests
+2. If monorepo detected AND cwd has its own manifest → create memory-bank/ at cwd (package-level)
+3. If monorepo detected but cwd has no manifest → warn user, ask whether to create here anyway
+4. If no monorepo indicators → warn user they may be in a subdirectory, suggest cd to git root
+
 ### 3. Ask about git tracking
 - Only if `.git/` exists and `memory-bank/` is not already in `.gitignore`
 - Ask: "Should the memory bank be **git-tracked** or **gitignored**?"
@@ -211,7 +217,7 @@ If any file exceeds its ceiling after population, compress before proceeding. Th
 - **decisions.md** — decisions, rejected alternatives, intentional patterns. The highest-value non-derivable content.
   - *Include*: key decisions with date/rationale/scope/status/source, rejected alternatives (≥1 on init), intentional patterns that look wrong but are correct
   - *Exclude*: vague observations, implementation details, code summaries
-  - Append-only, compress formatting if it grows
+  - Append-only. When the file exceeds 120 lines, trigger interactive compaction (see update.md step 6b)
 
 - If a section has no discoverable content:
   - Write `None identified` (for Blockers, Known Issues, Gotchas, Setup Gotchas, Environment Quirks)
@@ -219,65 +225,26 @@ If any file exceeds its ceiling after population, compress before proceeding. Th
   - NEVER leave a section heading with no content below it
   - NEVER use `Not yet documented`
 
-### 4b. Format verification (MANDATORY — 44 checks, ALL must pass)
+### 4a-ii. Secret/PII preflight
+Before writing any file, scan all candidate content for secret patterns: `sk-`, `ghp_`, `AIza`, `AKIA`, `-----BEGIN`, `password=`, `token=`, `secret=`, connection strings.
+If detected: **STOP**. Show the user what was detected. Ask to redact before writing. Default to redaction.
 
-After writing all 5 files, re-read each one and verify every check below. If ANY check fails, edit the file to fix it before proceeding. Do not skip this step.
+### 4b. Format verification (MANDATORY — 47 checks)
 
-#### File-Level Checks (6 checks)
-- [ ] Exactly 5 `.md` files exist in `memory-bank/` — no more, no fewer
-- [ ] No non-core files in `memory-bank/` (only exception: `.gitkeep`, `.gitignore`)
-- [ ] No file exceeds its hard ceiling (projectContext ≤80, activeState ≤70, systemPatterns ≤100, techContext ≤60, decisions ≤150)
-- [ ] Essential files combined (projectContext + activeState) ≤ 150 lines
-- [ ] Total all files ≤ 460 lines
-- [ ] No subdirectories in `memory-bank/`
+After writing all 5 files, run the validation checks defined in `references/commands/status.md` step 4. All BLOCKING checks must pass. Fix any failures before proceeding.
 
-#### Derivability Gate Checks (11 checks)
-- [ ] No build/dev command tables in any file
-- [ ] No dependency lists or tables in any file
-- [ ] No infrastructure inventory fields (Hosting, CI/CD, Database, External services)
-- [ ] No naming convention tables in any file
-- [ ] No data flow sections in any file
-- [ ] No error handling sections in any file
-- [ ] No evolution/changelog entries in any file
-- [ ] No completed work items in activeState.md
-- [ ] No recent changes list in activeState.md
-- [ ] No framework/runner/bundler/linter/package-manager fields in techContext.md
-- [ ] No code summaries (what a function does, what a module contains)
+**Do not duplicate the check list here** — `status.md` is the single authoritative spec for all validation checks. Refer to it for the complete list.
 
-#### Structural Checks (17 checks)
-- [ ] projectContext.md has all 7 required section headings: `## Identity`, `## Purpose`, `## Target Audience`, `## Core Requirements`, `## Success Criteria`, `## Key User Flows`, `## Scope` (with `### In Scope` and `### Out of Scope`)
-- [ ] activeState.md has all 8 required section headings: `## Resume Here`, `## Primary Thread`, `## Working Set`, `## In Progress`, `## Remaining`, `## Blockers`, `## Known Issues`, `## Open Questions`
-- [ ] systemPatterns.md has all 5 required section headings: `## Architecture Overview`, `## Key Design Decisions`, `## Design Patterns`, `## Component Relationships`, `## Gotchas & Traps`
-- [ ] techContext.md has all 4 required section headings: `## Stack`, `## Non-Obvious Constraints`, `## Setup Gotchas`, `## Environment Quirks`
-- [ ] decisions.md has all 3 required section headings: `## Key Decisions`, `## Rejected Alternatives`, `## Intent & Patterns`
-- [ ] No additional section headings beyond those specified above
-- [ ] All key-value fields use `Key: value` format — not bullets, not bold labels, not prose
-- [ ] Component Relationships uses arrow notation `->` (not prose)
-- [ ] Key User Flows uses arrow notation `→` (not numbered steps)
-- [ ] Resume Here names a specific file, function, or task (not generic)
-- [ ] Working Set contains 3-5 file paths
-- [ ] Every Key Decision entry has all 4 required lines: date+decision, Scope, Status, Source
-- [ ] Decision dates are commit dates, not analysis dates (use earliest evidencing commit if unknown)
-- [ ] ≥1 Rejected Alternative entry with all 3 required lines (`**What was considered**`, `**Why rejected**`, `**Reconsider if**`)
-- [ ] No section heading has empty content below it
-- [ ] No `[fill:]` placeholders remain
-- [ ] No `Not yet documented` appears anywhere
+**Total: 47 checks. All BLOCKING checks must pass. WARNINGs and INFO items are reported but do not block init.**
 
-#### Evidence Checks (5 checks)
-- [ ] systemPatterns.md, techContext.md, decisions.md each have ≥1 `Source:` line
-- [ ] Every `Source:` reference points to a file that exists in the project
-- [ ] Warm files use confidence markers `[observed]`, `[inferred]`, or `[assumed]` on claims
-- [ ] Essential files (projectContext, activeState) contain zero `Source:` lines
-- [ ] Essential files contain zero confidence markers
-
-#### Specificity Checks (5 checks)
-- [ ] No sentence passes the substitution test (could describe a different project)
-- [ ] No unquantified vague terms ("several", "various", "many", "some")
-- [ ] No hedging language ("seems to", "appears to", "might") outside Open Questions
-- [ ] No tautologies (sentence restates its section heading)
-- [ ] Every section contains ≥1 proper noun (file path, tool name, pattern name, dependency, config key)
-
-**Total: 44 checks. All 44 must pass.**
+### 4c. Rollback on partial failure
+If any file creation fails or validation fails mid-init:
+1. Report which files were created successfully and which failed
+2. Ask user: "Init partially completed. Options:
+   (a) Delete partial memory-bank/ and retry from scratch
+   (b) Keep partial state and fix manually
+   (c) Cancel"
+3. Never leave partial state without informing the user
 
 ### 5. Create/update agent config
 

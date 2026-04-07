@@ -1,3 +1,4 @@
+<!-- MEMORY-BANK-START -->
 @memory-bank/projectContext.md
 @memory-bank/activeState.md
 
@@ -39,3 +40,4 @@ Read these files ONLY when the current task directly requires them. NEVER pre-em
 - **When a decision is made or an approach is rejected**, log it in `decisions.md` (append-only — never remove entries)
 - **Before ending a session** where significant work was done, suggest running the update command
 - The `memory-bank/` directory contains exactly 5 core files — do not create additional files in it
+<!-- MEMORY-BANK-END -->

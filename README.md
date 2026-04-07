@@ -51,11 +51,16 @@ npx skills add spiderpunklabs/memory
 |---------|---------|
 | `init [description]` | Initialize a new memory bank in the current project |
 | `update` | Update memory bank files with current project state |
-| `status` | Strict validation — 44 pass/fail checks |
+| `status` | Strict validation — 47 checks with severity tiers |
 | `export` | Consolidate all files into a single markdown document |
 | `ignore` | Add `memory-bank/` to `.gitignore` |
 | `track` | Remove `memory-bank/` from `.gitignore` |
 | `purge` | Delete memory bank and remove agent config imports |
+| `search <query>` | Search across all memory bank files |
+| `diff` | Show changes to memory bank since last commit |
+| `restore [source]` | Restore from backup, archive, or git commit |
+| `compact` | Interactive guided compression of memory files |
+| `hook` | Install pre-commit hook for validation |
 
 ## Claude Code
 
@@ -99,7 +104,7 @@ Re-scans git history and project state. Updates `activeState.md` and any other f
 /memory status
 ```
 
-Strict validator — runs 44 pass/fail checks covering file structure, derivability gate, section headings, evidence anchors, confidence markers, and content specificity. Final line: `STATUS: ALL CHECKS PASSED` or `STATUS: N FAILURES DETECTED`.
+Strict validator — runs 47 checks with severity tiers (BLOCKING/WARNING/INFO) covering file structure, derivability gate, section headings, evidence anchors, confidence markers, and content specificity. Final line: `STATUS: ALL CHECKS PASSED` or `STATUS: N FAILURES DETECTED`.
 
 ### Export
 
@@ -107,7 +112,36 @@ Strict validator — runs 44 pass/fail checks covering file structure, derivabil
 /memory export
 ```
 
-Consolidates all 5 files into a single markdown document for sharing or backup.
+Consolidates all 5 files into a single markdown document for sharing or backup. Use `--redacted` to strip internal paths and active state for external sharing.
+
+## Full Lifecycle
+
+```
+init → [update → status]* → compact → [update → status]* → purge
+         ↑                                    ↑
+         └── search / diff / restore ─────────┘
+```
+
+| When | Command |
+|------|---------|
+| Starting a project | `init` (once) |
+| After each work session | `update` |
+| Before important decisions | `status` (validate health) |
+| When files approach ceilings | `compact` (guided compression) |
+| To see what changed | `diff` |
+| To find specific decisions | `search <query>` |
+| To share context | `export` (or `export --redacted`) |
+| To recover from mistakes | `restore` |
+| To enable commit validation | `hook` |
+| To clean up | `purge` (irreversible after archive deletion) |
+
+## Shell Script Validator
+
+The project includes an optional POSIX shell script (`references/scripts/memory-bank-validate.sh`) that deterministically validates 40 of 47 checks plus secret detection. The remaining 4 checks (#17, #43, #44, #45) are heuristic and require LLM judgment via `memory status`.
+
+Install the pre-commit hook with `memory hook` to automatically validate memory bank files before each commit. The hook validates the staged index (not the working tree) and fails closed if the validator is not found.
+
+Run the acceptance test suite: `./references/scripts/memory-bank-test.sh`
 
 ## Codex
 
@@ -205,7 +239,7 @@ The memory bank files themselves are plain markdown — readable by any tool.
     ├── commands/
     │   ├── init.md               # Initialize memory bank
     │   ├── update.md             # Update memory bank
-    │   ├── status.md             # Strict validation (44 checks)
+    │   ├── status.md             # Strict validation (47 checks)
     │   ├── export.md             # Export to single doc
     │   ├── ignore.md             # Gitignore memory bank
     │   ├── track.md              # Un-gitignore memory bank
