@@ -74,6 +74,11 @@ Claude Code invokes skills using slash command syntax — prefix any subcommand 
 /memory ignore
 /memory track
 /memory purge
+/memory search <query>
+/memory diff
+/memory restore
+/memory compact
+/memory hook
 ```
 
 ### Initialize a memory bank
@@ -155,6 +160,11 @@ $memory export
 $memory ignore
 $memory track
 $memory purge
+$memory search <query>
+$memory diff
+$memory restore
+$memory compact
+$memory hook
 ```
 
 Examples:
@@ -163,6 +173,9 @@ Examples:
 $memory init A Go microservice with gRPC and PostgreSQL
 $memory update
 $memory status
+$memory search billing
+$memory diff
+$memory compact
 ```
 
 Codex can also invoke the skill implicitly via natural language:
@@ -171,6 +184,11 @@ Codex can also invoke the skill implicitly via natural language:
 - "update memory bank"
 - "check memory status"
 - "export memory bank"
+- "search memory for billing"
+- "what changed in memory"
+- "restore memory bank"
+- "compress memory bank"
+- "install memory hook"
 
 ## Memory Bank Files
 
@@ -203,7 +221,7 @@ project, suggest running `/memory init` (or `$memory init` in Codex).
 2. The init step adds 2 essential file imports to your agent config (e.g., `CLAUDE.md`)
 3. At the start of each session, your agent loads the 2 essential files automatically and reads the 3 warm files on demand as the task requires
 4. **`update`** refreshes the files based on git history and current state, with derivability gate enforcement, drift checking, and evidence validation
-5. **`status`** runs 44 strict pass/fail checks covering structure, derivability, evidence, and specificity
+5. **`status`** runs 47 checks with severity tiers (BLOCKING/WARNING/INFO) covering structure, derivability, evidence, specificity, and security
 6. Context persists across sessions — no re-explaining your project
 
 ### Derivability gate
@@ -243,7 +261,16 @@ The memory bank files themselves are plain markdown — readable by any tool.
     │   ├── export.md             # Export to single doc
     │   ├── ignore.md             # Gitignore memory bank
     │   ├── track.md              # Un-gitignore memory bank
-    │   └── purge.md              # Delete everything
+    │   ├── purge.md              # Delete everything
+    │   ├── search.md             # Search across memory files
+    │   ├── diff.md               # Show memory bank changes
+    │   ├── restore.md            # Restore from backup/git
+    │   ├── compact.md            # Interactive guided compression
+    │   └── hook.md               # Install pre-commit hook
+    ├── scripts/
+    │   ├── memory-bank-validate.sh  # POSIX validator (40/47 checks + secrets)
+    │   ├── memory-bank-hook.sh      # Pre-commit hook (fail-closed)
+    │   └── memory-bank-test.sh      # Acceptance test suite (12 tests)
     └── templates/
         ├── projectContext.md
         ├── activeState.md
@@ -261,7 +288,7 @@ The memory bank files themselves are plain markdown — readable by any tool.
 - **Total budget: 460 lines** — all 5 files combined. No file may exceed its individual ceiling.
 - **Only 5 files** — do not create additional files in `memory-bank/`. If content doesn't fit, compress.
 - **Add evidence to non-obvious claims** — in warm files (decisions, systemPatterns, techContext), include a `Source:` line and confidence markers (`[observed]`, `[inferred]`, `[assumed]`). The status command validates these.
-- **decisions.md is append-only** — never remove entries; every decision includes Scope, Status, and Source fields
+- **decisions.md is append-only** — never remove entries without user approval. Superseded decisions can be compacted to a 1-line format via `memory compact`, but only with explicit user confirmation. Every decision includes Scope, Status, and Source fields
 - **Every decision implies a rejected alternative** — document what was considered and why it was rejected
 
 ## Design
