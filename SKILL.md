@@ -1,77 +1,59 @@
 ---
 name: memory
 description: >-
-  Persistent project memory for AI coding agents. Maintains 5 structured markdown
-  files (project context, active state, system patterns, tech context, decisions)
+  Persistent project memory for AI coding agents. Maintains 4 markdown files
   that survive between sessions. Use when the user says "memory init",
-  "memory update", "memory status", "memory export", "memory ignore",
-  "memory track", "memory purge", "memory search", "memory diff",
-  "memory restore", "memory compact", "memory hook",
-  "initialize memory bank", "setup memory bank",
-  "create memory bank", "update memory bank", "check memory status",
-  or "update project context".
-version: 0.3.0
+  "memory update", "memory status", "memory compact", "memory purge",
+  "memory search", "memory diff", "initialize memory", "update memory",
+  or "check memory status".
+version: 1.0.0
 ---
 
-# memory — Project Memory Bank
+# memory — Project Memory
 
-Manage a structured, file-based memory bank that persists project context across AI coding agent sessions. Works with Claude Code, Codex, Cursor, and any agent that reads SKILL.md.
+Lightweight session memory using markdown files. Captures what code can't tell you: decisions, intent, gotchas, and handoff state.
 
-## Subcommand Router
+## Memory Files
 
-Determine the subcommand from the user's message. Match the first recognized keyword after the skill invocation (or from natural language triggers like "initialize memory bank").
+| File | Purpose | Budget | Loading |
+|------|---------|--------|---------|
+| `HANDOFF.md` | Current state, next steps, session gotchas | 80 lines | Auto — every session |
+| `SCOPE.md` | Project identity, boundaries, conventions | 80 lines | Auto — every session |
+| `SYSTEM.md` | Architecture, components, constraints, gotchas | 80 lines | On demand |
+| `DECISIONS.md` | Decision log with reasoning, prepend-only | 120 lines | On demand |
 
-### Available Subcommands
+## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `init [description]` | Initialize a new memory bank in the current project |
-| `update` | Update memory bank files with current project state |
-| `status` | Health check — completeness, consistency, staleness |
-| `export` | Consolidate all files into a single markdown document |
-| `ignore` | Add `memory-bank/` to `.gitignore` |
-| `track` | Remove `memory-bank/` from `.gitignore` |
-| `purge` | Delete memory bank and remove agent config imports |
-| `search <query>` | Search across all memory bank files for a keyword |
-| `diff` | Show what changed in memory bank files since last commit |
-| `restore [source]` | Restore memory bank from backup, archive, or git commit |
-| `compact` | Interactive guided compression of memory bank files |
-| `hook` | Install pre-commit hook for memory bank validation |
+| Command | What it does |
+|---------|-------------|
+| `init [description]` | Create `.memory/` with populated files |
+| `update` | Refresh HANDOFF, append new decisions |
+| `status` | Quick health check on memory freshness |
+| `compact` | Suggest compressions, user approves each |
+| `purge` | Delete `.memory/` and clean agent config |
 
-### Routing Logic
+Inline (no separate spec needed):
+- `search <query>` — run `grep -ri "<query>" .memory/` and show results
+- `diff` — run `git diff -- .memory/` and show results
 
-1. Parse the user's message for a subcommand keyword: `init`, `update`, `status`, `export`, `ignore`, `track`, `purge`, `search`, `diff`, `restore`, `compact`, `hook`.
-2. If no subcommand is recognized, display the help table above and ask the user which operation they want.
-3. Check preconditions:
-   - For `init`: proceed directly (init handles its own edge cases including reinitialize).
-   - For all other commands: verify `memory-bank/` exists in the current working directory. If it does not exist, tell the user: "No memory bank found. Run the init command to create one."
-4. Read the corresponding reference file and execute its instructions:
-   - `init` → Read `references/commands/init.md` and execute its instructions.
-   - `update` → Read `references/commands/update.md` and execute its instructions.
-   - `status` → Read `references/commands/status.md` and execute its instructions.
-   - `export` → Read `references/commands/export.md` and execute its instructions.
-   - `ignore` → Read `references/commands/ignore.md` and execute its instructions.
-   - `track` → Read `references/commands/track.md` and execute its instructions.
-   - `purge` → Read `references/commands/purge.md` and execute its instructions.
-   - `search` → Read `references/commands/search.md` and execute its instructions.
-   - `diff` → Read `references/commands/diff.md` and execute its instructions.
-   - `restore` → Read `references/commands/restore.md` and execute its instructions.
-   - `compact` → Read `references/commands/compact.md` and execute its instructions.
-   - `hook` → Read `references/commands/hook.md` and execute its instructions.
+## Rules
 
-### Natural Language Triggers
+1. **Don't store what's derivable.** If `git log`, `grep`, or reading code answers it — skip it.
+2. **HANDOFF.md is ephemeral.** Rewrite it fully each update — it's a snapshot, not a log.
+3. **DECISIONS.md is prepend-only.** Newest first. Never edit past entries.
+4. **SCOPE.md is stable.** Update only when project direction genuinely changes.
+5. **Keep it tiny.** Prune aggressively. If a file is near budget, run `compact`.
 
-Map these phrases to subcommands:
+## Routing
 
-- "initialize memory bank", "setup memory bank", "create memory bank" → `init`
-- "update memory bank", "refresh memory", "update project context" → `update`
-- "check memory status", "memory health", "validate memory" → `status`
-- "export memory", "consolidate memory" → `export`
-- "ignore memory bank", "gitignore memory" → `ignore`
-- "track memory bank", "unignore memory" → `track`
-- "purge memory bank", "purge memory" → `purge` (requires explicit use of the word "purge" — do not trigger from "delete" or "remove")
-- "search memory", "find in memory", "memory search" → `search`
-- "memory diff", "what changed in memory" → `diff`
-- "restore memory", "recover memory bank" → `restore`
-- "compact memory", "compress memory bank" → `compact`
-- "install memory hook", "memory hook", "setup pre-commit" → `hook`
+1. Parse the user's message for a command keyword: `init`, `update`, `status`, `compact`, `purge`, `search`, `diff`.
+2. If no command recognized, show the commands table and ask.
+3. For `search`: run `grep -ri "<query>" .memory/` directly. No spec file needed.
+4. For `diff`: run `git diff -- .memory/` directly. No spec file needed.
+5. For all other commands: verify `.memory/` exists (except `init`). If missing, say "No memory found. Run init."
+6. Read and execute the corresponding spec:
+   - `init` → `references/cmd-init.md`
+   - `update` → `references/cmd-update.md`
+   - `status` → `references/cmd-status.md`
+   - `compact` → `references/cmd-compact.md`
+   - `purge` → `references/cmd-purge.md`
