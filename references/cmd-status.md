@@ -15,7 +15,7 @@ For each of HANDOFF.md, SCOPE.md, SYSTEM.md, DECISIONS.md:
 
 ### 3. Staleness check
 - HANDOFF.md last modified >3 days ago → "Stale — run `/memory update`"
-- SCOPE.md still contains template placeholders (`<!-- `) → "Incomplete — fill it in"
+- Any of HANDOFF.md, SCOPE.md, SYSTEM.md, DECISIONS.md still contains template placeholders (`<!-- `) → "<file> incomplete — fill it in". Templates ship with HTML-comment placeholders that init strips after filling; surviving `<!-- ` markers mean a section was left blank.
 
 ### 4. Output
 ```

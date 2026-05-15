@@ -48,9 +48,9 @@ Inline (no separate spec needed):
 
 1. Parse the user's message for a command keyword: `init`, `update`, `status`, `compact`, `purge`, `search`, `diff`.
 2. If no command recognized, show the commands table and ask.
-3. For `search`: run `grep -ri "<query>" .memory/` directly. No spec file needed.
-4. For `diff`: run `git diff -- .memory/` directly. No spec file needed.
-5. For all other commands: verify `.memory/` exists (except `init`). If missing, say "No memory found. Run init."
+3. For all commands except `init`: verify `.memory/` exists. If missing, say "No memory found. Run init." and stop — applies to inline (`search`, `diff`) and spec-routed commands alike.
+4. For `search`: run `grep -ri "<query>" .memory/` directly. No spec file needed.
+5. For `diff`: run `git diff -- .memory/` directly. No spec file needed.
 6. Read and execute the corresponding spec:
    - `init` → `references/cmd-init.md`
    - `update` → `references/cmd-update.md`
