@@ -6,7 +6,7 @@ Create `.memory/` and populate it from a project scan.
 
 ### 1. Check for existing memory
 - If `.memory/` exists: ask "Reinitialize (overwrites current memory) or cancel?"
-- If `memory-bank/` exists (old format): ask "Migrate to new format or start fresh?"
+- Migration from a pre-v1.0.0 `memory-bank/` is not supported; the user must `init` fresh.
 
 ### 2. Scan the project
 Read what's available — don't force the user to answer questions if code exists:
@@ -35,12 +35,25 @@ Never store: dependency lists, build commands, directory listings, code summarie
 Detect which agent is running and update the appropriate config file:
 - **Claude Code** → append to `CLAUDE.md` (create if needed). Use `@.memory/` imports for auto-loading.
 - **Codex** → append to `AGENTS.md` (create if needed). Use plain file path references.
-- **Cursor** → append to `.cursorrules` (create if needed).
+- **Cursor** → write to `.cursor/rules/memory.mdc` if `.cursor/` exists (modern, preferred). Otherwise append to `.cursorrules` (legacy fallback). Create the target file if needed.
 - Read `agent-config-snippet.md` for the exact content to inject.
+
+Marker contract (applies to every injected block):
+- Each block is bracketed by `<!-- memory:begin v=1.0.0 -->` and `<!-- memory:end -->`.
+- If a pre-existing block bounded by these exact markers is already present in the target file, replace its full contents (markers included) with the fresh block. Do not duplicate.
+- If no such block exists, append the full block at the end of the file.
+- Never edit content adjacent to the markers; treat the bounded region as owned by this skill.
 
 ### 6. Git tracking
 - If `.git/` exists: ask "Git-track or gitignore `.memory/`?"
-- If gitignored: append `.memory/` to `.gitignore`
+- If gitignored: append the following three-line ownership block to `.gitignore` (create if needed). Comment lines starting with `#` are valid gitignore syntax and ignored by git matching, so they establish provenance without affecting ignore behavior.
+  ```
+  # memory:begin v=1.0.0
+  .memory/
+  # memory:end
+  ```
+  - If a block bounded by `# memory:begin` and `# memory:end` already exists, leave it as-is (idempotent).
+  - If `.memory/` is already present in `.gitignore` outside of the ownership block, do not modify the user's line — append the ownership block anyway so purge has something to clean. The duplicate is harmless.
 - If no `.git/`: skip this step
 
 ### 7. Report

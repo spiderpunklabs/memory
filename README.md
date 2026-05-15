@@ -21,11 +21,6 @@ Only HANDOFF and SCOPE auto-load each session (~160 lines). SYSTEM and DECISIONS
 ## Install
 
 ```bash
-npx skills add spiderpunklabs/memory
-```
-
-Or manually:
-```bash
 git clone https://github.com/spiderpunklabs/memory.git ~/.claude/skills/memory
 ```
 
@@ -75,7 +70,7 @@ git clone https://github.com/spiderpunklabs/memory.git ~/.claude/skills/memory
 Works with any agent that can read markdown:
 - **Claude Code** — `@` imports in CLAUDE.md
 - **Codex** — file path references in AGENTS.md
-- **Cursor** — file references in .cursorrules
+- **Cursor** — file references in `.cursor/rules/memory.mdc` (modern, preferred) or `.cursorrules` (legacy fallback)
 - **Any other agent** — point it at `.memory/`
 
 ## License
