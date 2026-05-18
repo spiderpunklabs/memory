@@ -1,7 +1,17 @@
-# gitleaks config — extends default ruleset, no allowlist needed for
-# markdown-only skill repo. Add entries here if a finding turns out to be
-# benign (e.g. a documented example token). Every allowlist entry MUST
-# include a `description` explaining why the finding is benign.
+# .gitleaks.toml — memory
+#
+# Extends the default gitleaks ruleset. Gitleaks v8 CLI schema: `paths`
+# is a list of Go regular expressions (not globs). Each allowlist entry
+# MUST include a `description` explaining why the finding is benign.
 
 [extend]
 useDefault = true
+
+[allowlist]
+description = "Documented test fixtures with example token-shaped strings."
+paths = [
+  # references/scripts/memory-bank-test.sh contains an intentional
+  # GitHub PAT-shaped fixture string used to assert the secret-detection
+  # logic works. Not a real credential.
+  '''references/scripts/memory-bank-test\.sh$''',
+]
