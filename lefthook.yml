@@ -1,0 +1,9 @@
+# lefthook.yml — wraps scripts/check-staged.sh, the single source of truth.
+# Install: `brew install lefthook && lefthook install`
+
+pre-commit:
+  parallel: true
+  commands:
+    check-staged:
+      run: bash scripts/check-staged.sh
+      stage_fixed: true

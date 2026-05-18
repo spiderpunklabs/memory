@@ -1,0 +1,7 @@
+# gitleaks config — extends default ruleset, no allowlist needed for
+# markdown-only skill repo. Add entries here if a finding turns out to be
+# benign (e.g. a documented example token). Every allowlist entry MUST
+# include a `description` explaining why the finding is benign.
+
+[extend]
+useDefault = true
