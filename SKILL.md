@@ -6,7 +6,7 @@ description: >-
   "memory update", "memory status", "memory compact", "memory purge",
   "memory search", "memory diff", "initialize memory", "update memory",
   or "check memory status".
-version: 1.0.0
+version: 1.1.0
 ---
 
 # memory — Project Memory
@@ -21,6 +21,8 @@ Lightweight session memory using markdown files. Captures what code can't tell y
 | `SCOPE.md` | Project identity, boundaries, conventions | 80 lines | Auto — every session |
 | `SYSTEM.md` | Architecture, components, constraints, gotchas | 80 lines | On demand |
 | `DECISIONS.md` | Decision log with reasoning, prepend-only | 120 lines | On demand |
+
+"Auto" means: Claude Code loads the file into context through the `@.memory/` imports in the `AGENTS.md` block; Codex, Cursor, and other agents read it at session start because the block tells them to. Claude Code sessions that do not read `AGENTS.md` (versions before v2.1.277, or the built-in AGENTS.md plugin disabled) are covered by the `@AGENTS.md` import that init adds to an existing `CLAUDE.md`.
 
 ## Commands
 

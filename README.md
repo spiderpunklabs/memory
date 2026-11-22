@@ -16,7 +16,7 @@ AI agents lose context between sessions. They re-discover gotchas, re-make decis
 - **SYSTEM.md** — How the system works, constraints, gotchas
 - **DECISIONS.md** — Why things are the way they are
 
-Only HANDOFF and SCOPE auto-load each session (~160 lines). SYSTEM and DECISIONS load on demand.
+Only HANDOFF and SCOPE load each session (~160 lines): Claude Code auto-loads them through `@` imports, other agents read them on instruction. SYSTEM and DECISIONS load on demand.
 
 ## Install
 
@@ -42,8 +42,8 @@ git clone https://github.com/spiderpunklabs/memory.git ~/.claude/skills/memory
 
 ## Memory Files
 
-| File | Budget | Auto-loaded | Updated |
-|------|--------|-------------|---------|
+| File | Budget | Loaded each session | Updated |
+|------|--------|---------------------|---------|
 | HANDOFF.md | 80 lines | Yes | Every session (full rewrite) |
 | SCOPE.md | 80 lines | Yes | Rarely (when direction changes) |
 | SYSTEM.md | 80 lines | On demand | When architecture changes |
@@ -68,8 +68,9 @@ git clone https://github.com/spiderpunklabs/memory.git ~/.claude/skills/memory
 ## Compatibility
 
 Works with any agent that can read markdown:
-- **Claude Code** — `@` imports in CLAUDE.md
-- **Codex** — file path references in AGENTS.md
+- **Claude Code** — one block in `AGENTS.md`; its `@.memory/` imports are expanded, so HANDOFF and SCOPE are in context from the start. Claude Code reads `AGENTS.md` only when there is no `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or above it, so when the project has its own `CLAUDE.md`, init appends an `@AGENTS.md` import to it (and warns if the only such file is one it should not edit). The same import covers sessions that do not read `AGENTS.md` directly (versions before v2.1.277, or the built-in AGENTS.md plugin disabled).
+- **Codex** — the same `AGENTS.md` block; Codex reads the listed files at session start because the block tells it to
+- **Upgrading from v1.0.0** — re-run `/memory init`: it moves the block from `CLAUDE.md` to `AGENTS.md` and leaves an `@AGENTS.md` import behind
 - **Cursor** — file references in `.cursor/rules/memory.mdc` (modern, preferred) or `.cursorrules` (legacy fallback)
 - **Any other agent** — point it at `.memory/`
 
