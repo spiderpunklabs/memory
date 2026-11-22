@@ -33,7 +33,7 @@ Never store: dependency lists, build commands, directory listings, code summarie
 
 ### 5. Configure agent
 Detect which agent is running and update the appropriate config file:
-- **Claude Code** → append to `AGENTS.md` (create if needed), never `CLAUDE.md`: Claude Code reads `AGENTS.md` natively, and a `CLAUDE.md` anywhere in the repo would make it ignore `AGENTS.md`. Use plain file path references (the `@.memory/` import syntax is not supported in `AGENTS.md`).
+- **Claude Code** → append to `AGENTS.md` (create if needed), never `CLAUDE.md`: Claude Code reads `AGENTS.md` natively, and a `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or any directory above it would make it read that file instead of `AGENTS.md`. Use plain file path references (the `@.memory/` import syntax is not supported in `AGENTS.md`).
 - **Codex** → append to `AGENTS.md` (create if needed). Use plain file path references.
 - Claude Code and Codex share the same `AGENTS.md` block, so inject it once.
 - **Cursor** → write to `.cursor/rules/memory.mdc` if `.cursor/` exists (modern, preferred). Otherwise append to `.cursorrules` (legacy fallback). Create the target file if needed.

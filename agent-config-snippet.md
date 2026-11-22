@@ -6,7 +6,7 @@ Every injected block is bracketed by `<!-- memory:begin v=1.0.0 -->` / `<!-- mem
 
 ## Claude Code / Codex (AGENTS.md)
 
-One block serves both agents. Never write it to `CLAUDE.md`: a `CLAUDE.md` in the repo makes Claude Code ignore `AGENTS.md`.
+One block serves both agents. Never write it to `CLAUDE.md`: a `CLAUDE.md`, `.claude/CLAUDE.md`, or `CLAUDE.local.md` in the working directory or any directory above it makes Claude Code read that file instead of `AGENTS.md`.
 
 ```markdown
 <!-- memory:begin v=1.0.0 -->
